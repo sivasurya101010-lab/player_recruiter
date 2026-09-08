@@ -29,7 +29,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'users'
+    'users',
+    'rest_framework_simplejwt.token_blacklist',
+    'sports',
+    'games',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +134,4 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
+
