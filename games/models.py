@@ -40,3 +40,15 @@ class Game(models.Model):
 
     def __str__(self):
         return self.title
+
+    
+
+class GamePlayer(models.Model):
+    game=models.ForeignKey(Game,on_delete=models.CASCADE,related_name="participation")
+
+    user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name="joined_games")
+
+    joined_at=models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['game', 'user'],name='unique_game_participant')]
