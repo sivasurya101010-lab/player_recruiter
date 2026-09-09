@@ -28,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
         return
 
 
-    def create(self, validated_data):
+    def create(self, validated_data): #we exciptly uses create method to hash pass (create_user hashes it)
         user=User.objects.create_user(**validated_data)
 
         return user
