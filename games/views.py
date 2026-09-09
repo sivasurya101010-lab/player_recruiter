@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Game,GamePlayer
 from .serializer import GameSerializer
 
-class GameViews(generics.CreateAPIView):
+class GameCreateView(generics.CreateAPIView):
     serializer_class=GameSerializer
     permission_classes=[IsAuthenticated]
 
