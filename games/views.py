@@ -13,6 +13,12 @@ class GameCreateView(generics.CreateAPIView):
 
         GamePlayer.objects.create(user=self.request.user,game=game)
 
+class GameListView(generics.ListAPIView):
+
+    queryset=Game.objects.all().order_by('-created_at')
+    serializer_class=GameSerializer
+    permission_classes=[IsAuthenticated]
+
 
 
 
