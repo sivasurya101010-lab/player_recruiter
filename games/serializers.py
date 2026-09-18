@@ -1,15 +1,30 @@
 from rest_framework import serializers
 
-from .models import Game,GamePlayer
+from .models import Game
 from sports.models import Sports
 
+from users.serializers import UserSerializer
+from sports.serializers import SportSerializer
+
+
+
 class GameSerializer(serializers.ModelSerializer):
+
+    creator = UserSerializer(read_only=True)
+    sport_details = SportSerializer(source='sport',read_only=True)
+
+
+    #this sport is to validate the user providing sport id
+    sport = serializers.PrimaryKeyRelatedField(queryset=Sports.objects.filter(is_active=True))
+        
 
     current_palyers=serializers.SerializerMethodField
     available_slots=serializers.SerializerMethodField
 
     class Meta:
+
         model=Game
+
         fields= '__all__'
         read_only_fields = ['id','creator','status','created_at','updated_at']
 
@@ -44,4 +59,8 @@ class GameSerializer(serializers.ModelSerializer):
         values['custom_sport_name'] = custom_sport_name
 
         return values
+
+
+        
+
 
