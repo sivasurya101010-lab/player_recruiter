@@ -19,14 +19,14 @@ class UserSerializer(serializers.ModelSerializer):
             'bio',
             'location',]
 
-        extra_kwrgs={'password':{'write_only':True},  'validators': [validate_password],}
+        extra_kwargs={'password':{'write_only':True},  'validators': [validate_password]}
 
     def validate_email(self, value):
+
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("User already exists")
-        
-        return
 
+        return value
 
     def create(self, validated_data): #we exciptly uses create method to hash pass (create_user hashes it)
         user=User.objects.create_user(**validated_data)

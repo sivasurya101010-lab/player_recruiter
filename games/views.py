@@ -69,11 +69,11 @@ class GameJoinView(generics.GenericAPIView):
         if game.status!=Game.Status.OPEN:
             return Response({'details':'Game is not available'},status=status.HTTP_400_BAD_REQUEST)
 
-        if game.participations.filter(user=request.user).exists():
+        if game.participation.filter(user=request.user).exists():
             return Response({'details':'player alraedy exists'})
 
          #here game.participations=gamepalyer table accessed using the foreing key reverse relation
-        if game.participations.count()>=game.players_needed:
+        if game.participation.count()>=game.players_needed:
             return Response({'details':'palyer slots are full'},status=status.HTTP_400_BAD_REQUEST)
 
         GamePlayer.objects.create(game=game,user=request.user)
