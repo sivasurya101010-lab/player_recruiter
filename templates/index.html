@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Recruiter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">Player Recruiter</a>
+        <div class="d-flex align-items-center gap-2">
+            <span id="user-name" class="text-white small"></span>
+            <button id="logout-btn" class="btn btn-outline-light btn-sm d-none">Logout</button>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-4">
+    <div id="alert-box"></div>
+
+    <section id="auth-section" class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h3>Login</h3>
+                    <p class="text-muted">Login to find and join games.</p>
+                    <form id="login-form">
+                        <input id="login-username" class="form-control mb-3" placeholder="Username" required>
+                        <input id="login-password" type="password" class="form-control mb-3" placeholder="Password" required>
+                        <button class="btn btn-primary w-100">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h3>Create account</h3>
+                    <p class="text-muted">Create your player profile.</p>
+                    <form id="register-form">
+                        <input id="register-username" class="form-control mb-2" placeholder="Username" required>
+                        <input id="register-email" type="email" class="form-control mb-2" placeholder="Email" required>
+                        <div class="row">
+                            <div class="col">
+                                <input id="register-first-name" class="form-control mb-2" placeholder="First name">
+                            </div>
+                            <div class="col">
+                                <input id="register-last-name" class="form-control mb-2" placeholder="Last name">
+                            </div>
+                        </div>
+                        <input id="register-password" type="password" class="form-control mb-3" placeholder="Password" required>
+                        <button class="btn btn-success w-100">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="app-section" class="d-none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="mb-1">Find a game</h2>
+                <p id="profile-summary" class="text-muted mb-0"></p>
+            </div>
+            <button id="refresh-btn" class="btn btn-outline-primary">Refresh</button>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Sport</label>
+                        <select id="filter-sport" class="form-select">
+                            <option value="">All sports</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Date</label>
+                        <input id="filter-date" type="date" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Status</label>
+                        <select id="filter-status" class="form-select">
+                            <option value="">All</option>
+                            <option value="OPEN">Open</option>
+                            <option value="FULL">Full</option>
+                            <option value="CANCELLED">Cancelled</option>
+                            <option value="COMPLETED">Completed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="games-list" class="row g-4 mb-5"></div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3>Create a game</h3>
+                <form id="game-form">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Title</label>
+                            <input id="game-title" class="form-control" placeholder="Sunday Football" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Sport</label>
+                            <select id="game-sport" class="form-select" required></select>
+                        </div>
+                        <div id="custom-sport-wrap" class="col-md-6 d-none">
+                            <label class="form-label">Custom sport</label>
+                            <input id="custom-sport" class="form-control" placeholder="Volleyball">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date</label>
+                            <input id="game-date" type="date" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Start time</label>
+                            <input id="game-time" type="time" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Duration (minutes)</label>
+                            <input id="game-duration" type="number" min="1" value="90" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Players needed</label>
+                            <input id="game-players" type="number" min="1" value="7" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Location</label>
+                            <input id="game-location" class="form-control" placeholder="Ground / stadium" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea id="game-description" class="form-control" rows="3" placeholder="Casual game..."></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-3">Create game</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>
