@@ -43,12 +43,11 @@ class GameTestCase(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def create_game(self):
-        response = self.client.post(
+        return self.client.post(
             '/api/game/create/',
             self.game_data,
             format='json'
         )
-        return response
 
     def test_game_creation_adds_creator_as_player(self):
         response = self.create_game()
@@ -72,7 +71,10 @@ class GameTestCase(TestCase):
             format='json'
         )
 
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_401_UNAUTHORIZED
+        )
 
     def test_game_list_returns_created_games(self):
         self.create_game()
@@ -82,6 +84,8 @@ class GameTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['title'], 'Sunday Football')
+        self.assertEqual(response.data[0]['current_players'], 1)
+        self.assertEqual(response.data[0]['available_slots'], 2)
 
     def test_game_detail_returns_game(self):
         create_response = self.create_game()
@@ -106,7 +110,10 @@ class GameTestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(GamePlayer.objects.filter(game_id=game_id).count(), 2)
+        self.assertEqual(
+            GamePlayer.objects.filter(game_id=game_id).count(),
+            2
+        )
 
     def test_player_cannot_join_same_game_twice(self):
         create_response = self.create_game()
@@ -125,9 +132,50 @@ class GameTestCase(TestCase):
             format='json'
         )
 
-        self.assertEqual(first_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(second_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(GamePlayer.objects.filter(game_id=game_id).count(), 2)
+        self.assertEqual(
+            first_response.status_code,
+            status.HTTP_201_CREATED
+        )
+        self.assertEqual(
+            second_response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
+        self.assertEqual(
+            GamePlayer.objects.filter(game_id=game_id).count(),
+            2
+        )
+
+    def test_game_becomes_full_when_last_slot_is_joined(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        self.client.force_authenticate(user=self.other_user)
+        join_response = self.client.post(
+            f'/api/game/{game_id}/join/',
+            {},
+            format='json'
+        )
+
+        self.assertEqual(join_response.status_code, status.HTTP_201_CREATED)
+
+        third_user = User.objects.create_user(
+            username='player3',
+            email='player3@test.com',
+            password='TestPassword123'
+        )
+
+        self.client.force_authenticate(user=third_user)
+        join_response = self.client.post(
+            f'/api/game/{game_id}/join/',
+            {},
+            format='json'
+        )
+
+        self.assertEqual(join_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            Game.objects.get(id=game_id).status,
+            Game.Status.FULL
+        )
 
     def test_player_cannot_join_full_game(self):
         create_response = self.create_game()
@@ -146,8 +194,13 @@ class GameTestCase(TestCase):
         )
 
         GamePlayer.objects.create(game_id=game_id, user=user3)
+        GamePlayer.objects.create(game_id=game_id, user=user4)
 
-        self.client.force_authenticate(user=user4)
+        game = Game.objects.get(id=game_id)
+        game.status = Game.Status.FULL
+        game.save(update_fields=['status'])
+
+        self.client.force_authenticate(user=self.other_user)
 
         response = self.client.post(
             f'/api/game/{game_id}/join/',
@@ -155,8 +208,10 @@ class GameTestCase(TestCase):
             format='json'
         )
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(GamePlayer.objects.filter(game_id=game_id).count(), 2)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
 
     def test_game_filter_by_sport(self):
         self.create_game()
@@ -173,14 +228,20 @@ class GameTestCase(TestCase):
 
         response = self.create_game()
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
 
     def test_duration_must_be_positive(self):
         self.game_data['duration'] = 0
 
         response = self.create_game()
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
 
     def test_other_sport_requires_custom_name(self):
         other = Sports.objects.create(name='Other')
@@ -188,7 +249,10 @@ class GameTestCase(TestCase):
 
         response = self.create_game()
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
         self.assertIn('custom_sport_name', response.data)
 
     def test_other_sport_accepts_custom_name(self):
@@ -198,5 +262,11 @@ class GameTestCase(TestCase):
 
         response = self.create_game()
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['custom_sport_name'], 'Volleyball')
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED
+        )
+        self.assertEqual(
+            response.data['custom_sport_name'],
+            'Volleyball'
+        )
