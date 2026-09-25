@@ -157,7 +157,7 @@ function gameCard(game) {
                     <div class="game-meta mb-3">
                         <div>📅 ${escapeHtml(game.date)} at ${escapeHtml(game.start_time)}</div>
                         <div>📍 ${escapeHtml(game.location)}</div>
-                        <div>👥 ${game.current_palyers}/${game.players_needed} players · ${game.available_slots} slots left</div>
+                        <div>👥 ${game.current_players}/${game.players_needed} players · ${game.available_slots} slots left</div>
                         <div>⏱ ${game.duration} minutes</div>
                     </div>
                     <button class="btn btn-outline-primary mt-auto" onclick="joinGame(${game.id})" ${canJoin ? '' : 'disabled'}>
