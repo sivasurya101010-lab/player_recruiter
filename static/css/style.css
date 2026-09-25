@@ -1,0 +1,33 @@
+body {
+    background: #f5f7fb;
+}
+
+.navbar-brand {
+    letter-spacing: 0.2px;
+}
+
+.card {
+    border: 0;
+    border-radius: 14px;
+}
+
+.game-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+}
+
+.badge-open {
+    background: #198754;
+}
+
+.badge-full {
+    background: #6c757d;
+}
+
+.game-meta {
+    font-size: 0.9rem;
+}
