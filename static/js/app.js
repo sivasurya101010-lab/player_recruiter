@@ -203,8 +203,8 @@ async function loadSports() {
 }
 
 function gameCard(game) {
-    const sportName = game.sport_details?.name || 'Sport';
-    const statusClass = game.status === 'OPEN' ? 'badge-open' : 'badge-full';
+    const sportName = game.sport_details?.name === 'Other' && game.custom_sport_name ? game.custom_sport_name : (game.sport_details?.name || 'Sport');
+    const statusClass = {OPEN: 'badge-open', FULL: 'badge-full', CANCELLED: 'badge-cancelled', COMPLETED: 'badge-completed'}[game.status] || 'badge-full';
 
     let actionButtons = `
         <button class="btn btn-outline-secondary btn-sm" onclick="showPlayers(${game.id})">
@@ -252,14 +252,16 @@ function gameCard(game) {
                         <h5 class="card-title mb-0">${escapeHtml(game.title)}</h5>
                         <span class="badge ${statusClass}">${escapeHtml(game.status)}</span>
                     </div>
-                    <p class="text-primary fw-semibold mb-2">${escapeHtml(sportName)}</p>
-                    <p class="text-muted mb-3">${escapeHtml(game.description || 'No description')}</p>
-                    <div class="game-meta mb-3">
-                        <div>📅 ${escapeHtml(game.date)} at ${escapeHtml(game.start_time)}</div>
-                        <div>📍 ${escapeHtml(game.location)}</div>
-                        <div>👥 ${game.current_players}/${game.players_needed} players · ${game.available_slots} slots left</div>                        <div>⏱ ${game.duration} minutes</div>
+                    <div class="d-flex align-items-center gap-2 mb-2"><span class="game-sport">${escapeHtml(sportName)}</span>${game.is_creator ? '<span class="game-role">Your game</span>' : (game.is_joined ? '<span class="game-role">Joined</span>' : '')}</div>
+                    <p class="game-description text-muted mb-3">${escapeHtml(game.description || 'No description provided.')}</p>
+                    <div class="game-details mb-3">
+                        <div class="game-detail-row"><span class="game-detail-label">Date</span><span>${escapeHtml(game.date)}</span></div>
+                        <div class="game-detail-row"><span class="game-detail-label">Time</span><span>${escapeHtml(game.start_time.slice(0, 5))}</span></div>
+                        <div class="game-detail-row"><span class="game-detail-label">Location</span><span class="text-break">${escapeHtml(game.location)}</span></div>
+                        <div class="game-detail-row"><span class="game-detail-label">Players</span><span>${game.current_players}/${game.players_needed} · ${game.available_slots} slots left</span></div>
+                        <div class="game-detail-row"><span class="game-detail-label">Duration</span><span>${game.duration} minutes</span></div>
                     </div>
-                    <div class="d-flex flex-wrap gap-2 mt-auto">
+                    <div class="game-actions d-flex flex-wrap gap-2 mt-auto">
                         ${actionButtons}
                     </div>
                 </div>
