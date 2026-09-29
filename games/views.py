@@ -156,7 +156,19 @@ class GameUpdateView(generics.RetrieveUpdateAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        return super().update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
+
+        game = self.get_object()
+        current_players = game.participation.count()
+
+        if current_players >= game.players_needed:
+            game.status = Game.Status.FULL
+        else:
+            game.status = Game.Status.OPEN
+
+        game.save(update_fields=['status', 'updated_at'])
+
+        return response
 
 
 class GameDeleteView(generics.DestroyAPIView):
