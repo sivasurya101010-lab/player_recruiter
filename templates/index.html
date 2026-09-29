@@ -10,28 +10,44 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+<nav class="navbar navbar-dark bg-dark sticky-top">
     <div class="container">
         <a class="navbar-brand fw-bold" href="#" id="navbar-home-link">PlayLink</a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#playlink-navbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="playlink-navbar">
-            <div id="app-nav-menu" class="navbar-nav me-auto ms-lg-4 d-none">
-                <button class="nav-link nav-menu-button" id="nav-home-btn" type="button">Home</button>
-                <button class="nav-link nav-menu-button" id="nav-status-btn" type="button">Game status</button>
-                <button class="nav-link nav-menu-button" id="nav-create-btn" type="button">Create game</button>
-            </div>
-
-            <div class="d-flex align-items-center gap-2 ms-auto">
-                <span id="user-name" class="text-white small"></span>
-                <button id="logout-btn" class="btn btn-outline-light btn-sm d-none">Logout</button>
-            </div>
+        <div class="d-flex align-items-center gap-2">
+            <button
+                id="menu-btn"
+                type="button"
+                class="btn btn-outline-light btn-sm d-none"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#playlink-menu"
+                aria-controls="playlink-menu"
+            >
+                Menu
+            </button>
+            <button id="logout-btn" class="btn btn-outline-light btn-sm d-none">Logout</button>
         </div>
     </div>
 </nav>
+
+<div
+    class="offcanvas offcanvas-start"
+    tabindex="-1"
+    id="playlink-menu"
+    aria-labelledby="playlink-menu-title"
+>
+    <div class="offcanvas-header">
+        <h5 id="playlink-menu-title" class="offcanvas-title">PlayLink</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="app-nav-menu" class="d-none">
+            <button class="menu-item" id="nav-home-btn" type="button">Home</button>
+            <button class="menu-item" id="nav-dashboard-btn" type="button">PlayLink Dashboard</button>
+            <button class="menu-item" id="nav-create-btn" type="button">Create game</button>
+        </div>
+    </div>
+</div>
 
 <main class="container py-4">
     <div id="alert-box"></div>
@@ -149,44 +165,15 @@
     <section id="app-section" class="d-none">
         <div class="dashboard-header mb-4">
             <div>
-                <p class="dashboard-eyebrow mb-1">PLAYLINK DASHBOARD</p>
+                <p class="dashboard-eyebrow mb-1">PLAYLINK HOME</p>
                 <h1 class="dashboard-title mb-1">Welcome, <span id="dashboard-user-name"></span></h1>
-                <p id="profile-summary" class="text-muted mb-0 d-none"></p>
             </div>
-            <div class="d-flex gap-2">
-                <button id="refresh-btn" class="btn btn-outline-primary">Refresh</button>
-            </div>
+            <button id="refresh-btn" class="btn btn-outline-primary">Refresh</button>
         </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-4">
-                <div class="dashboard-stat-card">
-                    <div class="dashboard-stat-label">Available games</div>
-                    <div id="stat-available-games" class="dashboard-stat-value">0</div>
-                    <div class="dashboard-stat-help">Games currently open to join</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="dashboard-stat-card">
-                    <div class="dashboard-stat-label">My joined games</div>
-                    <div id="stat-joined-games" class="dashboard-stat-value">0</div>
-                    <div class="dashboard-stat-help">Games you have joined</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="dashboard-stat-card">
-                    <div class="dashboard-stat-label">Games I created</div>
-                    <div id="stat-created-games" class="dashboard-stat-value">0</div>
-                    <div class="dashboard-stat-help">Games created by you</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="games-section-header" class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <h2 class="mb-1">Find a game</h2>
-                <p class="text-muted mb-0">Browse games and find players near you.</p>
-            </div>
+        <div id="games-section-header" class="mb-3">
+            <h2 class="mb-1">Find a game</h2>
+            <p class="text-muted mb-0">Filter games and find players near you.</p>
         </div>
 
         <div class="card shadow-sm mb-4">
@@ -216,7 +203,37 @@
             </div>
         </div>
 
-        <div id="games-list" class="row g-4 mb-5"></div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="mb-1">Recently added games</h2>
+                <p class="text-muted mb-0">The latest games posted on PlayLink.</p>
+            </div>
+        </div>
+
+        <div id="games-list" class="row g-4"></div>
+    </section>
+
+    <section id="dashboard-section" class="d-none">
+        <div class="dashboard-header mb-4">
+            <div>
+                <p class="dashboard-eyebrow mb-1">PLAYER DASHBOARD</p>
+                <h1 class="dashboard-title mb-1">PlayLink Dashboard</h1>
+                <p class="text-muted mb-0">Games you have joined.</p>
+            </div>
+            <button id="dashboard-refresh-btn" class="btn btn-outline-primary">Refresh</button>
+        </div>
+
+        <div id="joined-games-list" class="row g-4"></div>
+    </section>
+
+    <section id="create-section" class="d-none">
+        <div class="dashboard-header mb-4">
+            <div>
+                <p class="dashboard-eyebrow mb-1">HOST A GAME</p>
+                <h1 class="dashboard-title mb-1">Create a game</h1>
+                <p class="text-muted mb-0">Tell other players when and where you are playing.</p>
+            </div>
+        </div>
 
         <div id="create-game-card" class="card shadow-sm create-game-card">
             <div class="card-body p-4 p-lg-5">
