@@ -8,6 +8,8 @@ from .serializers import UserSerializer, LogoutSerializer
 
 
 class LoginView(TokenObtainPairView):
+    authentication_classes = []
+    permission_classes = []
 
     @extend_schema(
         summary="Login",
@@ -16,6 +18,7 @@ class LoginView(TokenObtainPairView):
             200: OpenApiResponse(description="Access and refresh tokens returned successfully."),
             401: OpenApiResponse(description="Invalid username or password."),
         },
+        auth=[],
         tags=["Authentication"],
     )
     def post(self, request, *args, **kwargs):
@@ -23,6 +26,8 @@ class LoginView(TokenObtainPairView):
 
 
 class RefreshTokenView(TokenRefreshView):
+    authentication_classes = []
+    permission_classes = []
 
     @extend_schema(
         summary="Refresh access token",
@@ -31,6 +36,7 @@ class RefreshTokenView(TokenRefreshView):
             200: OpenApiResponse(description="New access token returned successfully."),
             401: OpenApiResponse(description="Invalid or expired refresh token."),
         },
+        auth=[],
         tags=["Authentication"],
     )
     def post(self, request, *args, **kwargs):
@@ -38,6 +44,8 @@ class RefreshTokenView(TokenRefreshView):
 
 
 class RegisterView(generics.CreateAPIView):
+    authentication_classes = []
+    permission_classes = []
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -48,6 +56,7 @@ class RegisterView(generics.CreateAPIView):
             201: UserSerializer,
             400: OpenApiResponse(description="Invalid registration data."),
         },
+        auth=[],
         tags=["Authentication"],
     )
     def post(self, request, *args, **kwargs):
