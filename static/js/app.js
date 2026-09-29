@@ -398,6 +398,30 @@ function renderExploreSportTabs() {
     });
 }
 
+function formatGameDate(date) {
+    if (!date) return 'Date not set';
+
+    const parts = date.split('-');
+    if (parts.length !== 3) return date;
+
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+}
+
+function formatCreatedAt(value) {
+    if (!value) return 'Not available';
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+
+    return date.toLocaleString([], {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
 function exploreGameCard(game) {
     const sportName = game.sport_details?.name === 'Other' && game.custom_sport_name
         ? game.custom_sport_name
@@ -410,34 +434,33 @@ function exploreGameCard(game) {
         COMPLETED: 'badge-completed'
     }[game.status] || 'badge-full';
 
-    const date = game.date || 'Date not set';
+    const date = formatGameDate(game.date);
     const time = game.start_time ? game.start_time.slice(0, 5) : 'Time not set';
-    const playerText = `${game.current_players}/${game.players_needed} players`;
 
     let primaryAction = '';
     if (game.is_creator) {
         primaryAction = `
-            <button class="btn btn-outline-primary btn-sm" onclick="editGame(${game.id})">
+            <button class="btn btn-outline-primary btn-sm game-card-action" onclick="event.stopPropagation(); editGame(${game.id})">
                 Manage
             </button>
         `;
     } else if (game.is_joined) {
         primaryAction = `
-            <button class="btn btn-outline-danger btn-sm" onclick="leaveGame(${game.id})">
+            <button class="btn btn-outline-danger btn-sm game-card-action" onclick="event.stopPropagation(); leaveGame(${game.id})">
                 Leave
             </button>
         `;
     } else {
         const canJoin = game.status === 'OPEN' && game.available_slots > 0;
         primaryAction = `
-            <button class="btn btn-primary btn-sm" onclick="joinGame(${game.id})" ${canJoin ? '' : 'disabled'}>
+            <button class="btn btn-primary btn-sm game-card-action" onclick="event.stopPropagation(); joinGame(${game.id})" ${canJoin ? '' : 'disabled'}>
                 ${canJoin ? 'Join game' : 'Not available'}
             </button>
         `;
     }
 
     return `
-        <article class="explore-game-card">
+        <article class="explore-game-card" onclick="showGameDetails(${game.id})" tabindex="0" role="button" aria-label="View details for ${escapeHtml(game.title)}">
             <div class="explore-game-visual">
                 <span class="explore-game-sport-label">${escapeHtml(sportName)}</span>
                 <span class="explore-game-status ${statusClass}">${escapeHtml(game.status)}</span>
@@ -446,25 +469,21 @@ function exploreGameCard(game) {
                 <h3 class="explore-game-title" title="${escapeHtml(game.title)}">
                     ${escapeHtml(game.title)}
                 </h3>
-                <p class="explore-game-location" title="${escapeHtml(game.location)}">
-                    ${escapeHtml(game.location)}
-                </p>
-                <div class="explore-game-meta">
-                    <span><strong>${escapeHtml(date)}</strong></span>
-                    <span>${escapeHtml(time)}</span>
-                    <span>${escapeHtml(playerText)}</span>
+
+                <div class="explore-game-meta explore-game-card-details">
+                    <span title="Ground">📍 ${escapeHtml(game.location || 'Ground not set')}</span>
+                    <span title="Date">📅 ${escapeHtml(date)}</span>
+                    <span title="Time">🕒 ${escapeHtml(time)}</span>
                 </div>
-                <p class="explore-game-description">
-                    ${escapeHtml(game.description || 'No description provided.')}
-                </p>
+
                 <div class="explore-game-actions">
                     ${primaryAction}
                     <button
-                        class="explore-game-arrow"
+                        class="explore-game-arrow game-card-action"
                         type="button"
-                        onclick="showPlayers(${game.id})"
-                        aria-label="View players for ${escapeHtml(game.title)}"
-                        title="View players"
+                        onclick="event.stopPropagation(); showGameDetails(${game.id})"
+                        aria-label="View details for ${escapeHtml(game.title)}"
+                        title="View game details"
                     >
                         →
                     </button>
@@ -472,6 +491,47 @@ function exploreGameCard(game) {
             </div>
         </article>
     `;
+}
+
+async function showGameDetails(id) {
+    try {
+        const game = await apiFetch(`/game/${id}/`);
+
+        const creator = game.creator || {};
+        const creatorName = [creator.first_name, creator.last_name]
+            .filter(Boolean)
+            .join(' ') || creator.username || 'Unknown player';
+
+        const sportName = game.sport_details?.name === 'Other' && game.custom_sport_name
+            ? game.custom_sport_name
+            : (game.sport_details?.name || 'Sport');
+
+        const details = [
+            ['Created by', creatorName],
+            ['Created on', formatCreatedAt(game.created_at)],
+            ['Sport', sportName],
+            ['Date', formatGameDate(game.date)],
+            ['Time', game.start_time ? game.start_time.slice(0, 5) : 'Not set'],
+            ['Duration', game.duration ? `${game.duration} minutes` : 'Not set'],
+            ['Ground / place', game.location || 'Not set'],
+            ['Players', `${game.current_players || 0}/${game.players_needed || 0} · ${game.available_slots || 0} slots left`],
+            ['Status', game.status || 'Not set']
+        ];
+
+        $('game-details-title').textContent = game.title || 'Game details';
+        $('game-details-sport').textContent = sportName;
+        $('game-details-description').textContent = game.description || 'No description provided.';
+        $('game-details-list').innerHTML = details.map(([label, value]) => `
+            <div class="game-detail-modal-row">
+                <span class="game-detail-modal-label">${escapeHtml(label)}</span>
+                <span>${escapeHtml(value)}</span>
+            </div>
+        `).join('');
+
+        bootstrap.Modal.getOrCreateInstance($('game-details-modal')).show();
+    } catch (error) {
+        showAlert(error.message, 'danger');
+    }
 }
 
 function renderExploreGames(games) {
