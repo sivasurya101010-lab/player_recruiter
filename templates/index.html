@@ -44,13 +44,15 @@
 
                     <form id="login-form">
                         <label class="auth-input">
-                            <span>✉</span>
                             <input id="login-username" placeholder="Username" required>
                         </label>
 
                         <label class="auth-input">
-                            <span>🔒</span>
                             <input id="login-password" type="password" placeholder="Password" required>
+                        </label>
+                        <label class="show-password-option">
+                            <input id="login-show-password" type="checkbox">
+                            <span>Show password</span>
                         </label>
 
                         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -91,12 +93,10 @@
 
                     <form id="register-form">
                         <label class="auth-input">
-                            <span>👤</span>
                             <input id="register-username" placeholder="Username" required>
                         </label>
 
                         <label class="auth-input">
-                            <span>✉</span>
                             <input id="register-email" type="email" placeholder="Email address" required>
                         </label>
 
@@ -114,8 +114,11 @@
                         </div>
 
                         <label class="auth-input">
-                            <span>🔒</span>
                             <input id="register-password" type="password" placeholder="Password" required>
+                        </label>
+                        <label class="show-password-option">
+                            <input id="register-show-password" type="checkbox">
+                            <span>Show password</span>
                         </label>
 
                         <button class="btn auth-login-button w-100">

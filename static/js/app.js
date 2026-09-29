@@ -435,6 +435,14 @@ function showLoginPanel() {
 $('show-register-btn').addEventListener('click', showRegisterPanel);
 $('show-login-btn').addEventListener('click', showLoginPanel);
 
+$('login-show-password').addEventListener('change', () => {
+    $('login-password').type = $('login-show-password').checked ? 'text' : 'password';
+});
+
+$('register-show-password').addEventListener('change', () => {
+    $('register-password').type = $('register-show-password').checked ? 'text' : 'password';
+});
+
 $('login-form').addEventListener('submit', async (event) => {
     event.preventDefault();
 
