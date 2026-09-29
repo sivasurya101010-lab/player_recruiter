@@ -1252,6 +1252,36 @@ body {
     text-align: center;
 }
 
+/* Dashboard uses the same game card design as Home */
+#joined-games-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.dashboard-game-card {
+    flex: 0 0 258px;
+    min-width: 258px;
+    padding: 0;
+}
+
+.dashboard-game-card .explore-game-card {
+    width: 100%;
+}
+
+@media (max-width: 575px) {
+    #joined-games-list {
+        gap: 14px;
+    }
+
+    .dashboard-game-card {
+        flex-basis: 245px;
+        min-width: 245px;
+    }
+}
+
 @media (max-width: 575px) {
     .explore-games-header h2 {
         font-size: 23px;
