@@ -203,14 +203,18 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <h2 class="mb-1">Recently added games</h2>
-                <p class="text-muted mb-0">The latest games posted on PlayLink.</p>
+        <section id="explore-games-section" class="explore-games-section">
+            <div class="explore-games-header">
+                <h2>EXPLORE GAMES</h2>
+                <button id="see-more-games-btn" type="button" class="see-more-games-btn">
+                    See more games <span aria-hidden="true">→</span>
+                </button>
             </div>
-        </div>
 
-        <div id="games-list" class="row g-4"></div>
+            <div id="explore-sport-tabs" class="explore-sport-tabs" role="tablist" aria-label="Filter games by sport"></div>
+
+            <div id="games-list" class="explore-games-track"></div>
+        </section>
     </section>
 
     <section id="dashboard-section" class="d-none">
