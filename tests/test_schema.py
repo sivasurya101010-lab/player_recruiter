@@ -36,11 +36,11 @@ def test_openapi_schema_contains_playlink_endpoints():
 def test_openapi_schema_documents_jwt_authentication():
     client = APIClient()
 
-    response = client.get('/api/schema/')
+    response = client.get('/api/schema/', HTTP_ACCEPT='application/json')
 
     assert response.status_code == 200
 
-    schema = response.json()
+    schema = json.loads(response.content)
     security_schemes = schema['components']['securitySchemes']
 
     assert 'jwtAuth' in security_schemes
