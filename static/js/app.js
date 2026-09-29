@@ -605,7 +605,7 @@ $('edit-game-date').min = today;
 $('game-form').addEventListener('input', clearCreateGameError);
 $('edit-game-form').addEventListener('submit', saveGameEdit);
 $('refresh-btn').addEventListener('click', loadGames);
-$('create-game-shortcut').addEventListener('click', scrollToCreateGame);
+$('create-game-shortcut')?.addEventListener('click', scrollToCreateGame);
 $('filter-sport').addEventListener('change', loadGames);
 $('filter-date').addEventListener('change', loadGames);
 $('filter-status').addEventListener('change', loadGames);
