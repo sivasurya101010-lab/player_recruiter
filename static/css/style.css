@@ -770,3 +770,52 @@ body {
         padding-left: 0 !important;
     }
 }
+
+
+/* Phase 2 - Slide-out PlayLink menu */
+#playlink-menu {
+    width: min(320px, 86vw);
+}
+
+#playlink-menu .offcanvas-title {
+    color: #102a40;
+    font-weight: 800;
+}
+
+.menu-item {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #29465b;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 14px;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item:focus {
+    background: #f0f7f5;
+    color: #00a878;
+}
+
+.dashboard-empty-state {
+    padding: 48px 20px;
+    border: 1px dashed #d4dfe6;
+    border-radius: 16px;
+    background: #ffffff;
+    color: #668096;
+    text-align: center;
+}
+
+#create-section {
+    padding-bottom: 30px;
+}
+
+#dashboard-section {
+    padding-bottom: 30px;
+}
