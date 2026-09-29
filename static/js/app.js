@@ -393,8 +393,7 @@ function renderExploreSportTabs() {
             state.showAllExploreGames = false;
             const filterSport = $('filter-sport');
             if (filterSport) filterSport.value = state.exploreSport;
-            renderExploreGames(state.exploreGames || []);
-            renderExploreSportTabs();
+            loadGames().catch((error) => showAlert(error.message, 'danger'));
         });
     });
 }
