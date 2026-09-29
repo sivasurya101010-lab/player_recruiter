@@ -497,3 +497,46 @@ class GameTestCase(TestCase):
             status.HTTP_400_BAD_REQUEST
         )
         self.assertIn('players_needed', response.data)
+
+
+    def test_editing_full_game_to_add_slots_reopens_game(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        user3 = User.objects.create_user(
+            username='player3',
+            email='player3@test.com',
+            password='TestPassword123'
+        )
+
+        self.client.force_authenticate(user=self.other_user)
+        self.client.post(
+            f'/api/game/{game_id}/join/',
+            {},
+            format='json'
+        )
+
+        self.client.force_authenticate(user=user3)
+        self.client.post(
+            f'/api/game/{game_id}/join/',
+            {},
+            format='json'
+        )
+
+        self.assertEqual(
+            Game.objects.get(id=game_id).status,
+            Game.Status.FULL
+        )
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            f'/api/game/{game_id}/edit/',
+            {'players_needed': 4},
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            Game.objects.get(id=game_id).status,
+            Game.Status.OPEN
+        )
