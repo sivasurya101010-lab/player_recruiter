@@ -641,6 +641,17 @@ async function loadJoinedGames() {
     const gamesResponse = await apiFetch('/game/');
     const games = Array.isArray(gamesResponse) ? gamesResponse : (gamesResponse.results || []);
     const joinedGames = games.filter((game) => game.is_joined);
+    const hostedGames = games.filter((game) => game.is_creator);
+    const today = new Date().toISOString().split('T')[0];
+    const upcomingGames = joinedGames.filter((game) =>
+        game.date >= today &&
+        game.status !== 'CANCELLED' &&
+        game.status !== 'COMPLETED'
+    );
+
+    $('dashboard-joined-count').textContent = joinedGames.length;
+    $('dashboard-upcoming-count').textContent = upcomingGames.length;
+    $('dashboard-hosted-count').textContent = hostedGames.length;
 
     $('joined-games-list').innerHTML = joinedGames.length
         ? joinedGames.map((game) => `
