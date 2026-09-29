@@ -1,4 +1,4 @@
-const API = '/api';
+const API = `${window.location.origin}/api`;
 
 const state = {
     access: localStorage.getItem('playerRecruiterAccess'),
@@ -215,14 +215,12 @@ async function restoreSession() {
     $('session-loading').classList.remove('d-none');
     $('auth-section').classList.add('d-none');
 
-    // On a full page reload, use the saved refresh token first. This avoids
-    // depending on an old access token and gives us one deterministic
-    // session-restoration path.
     if (!state.refresh) {
         try {
             await loadApp();
             return;
         } catch (error) {
+            console.error('PlayLink session restore failed:', error);
             clearTokens();
             showLoginPanel();
             showAlert('Your saved login session has expired. Please log in again.', 'danger');
@@ -234,10 +232,12 @@ async function restoreSession() {
         const refreshResponse = await fetch(API + '/auth/refresh/', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({refresh: state.refresh})
+            body: JSON.stringify({refresh: state.refresh}),
+            cache: 'no-store'
         });
 
         if (!refreshResponse.ok) {
+            console.error('PlayLink refresh request failed:', refreshResponse.status);
             clearTokens();
             showLoginPanel();
             showAlert('Your saved login session has expired. Please log in again.', 'danger');
@@ -258,23 +258,21 @@ async function restoreSession() {
             localStorage.setItem('playerRecruiterRefresh', data.refresh);
         }
 
-        // Only after the new access token is stored do we request the profile
-        // and recent games.
         await loadApp();
     } catch (error) {
+        console.error('PlayLink session restore error:', error);
+        $('session-loading').classList.add('d-none');
+        showLoginPanel();
+
         if (error instanceof TypeError) {
-            $('session-loading').classList.add('d-none');
-            showLoginPanel();
             showAlert(
-                'PlayLink could not reach the server. Make sure the Django server is running and refresh again.',
+                'PlayLink could not reach the server. Check the browser address and make sure Django is running on the same address.',
                 'danger'
             );
             return;
         }
 
-        clearTokens();
-        showLoginPanel();
-        showAlert('Your saved login session has expired. Please log in again.', 'danger');
+        showAlert('PlayLink could not restore your session. Please try again.', 'danger');
     }
 }
 
