@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 def test_openapi_schema_contains_playlink_endpoints():
     client = APIClient()
 
-    response = client.get('/api/schema/')
+    response = client.get('/api/schema/', HTTP_ACCEPT='application/json')
 
     assert response.status_code == 200
 
