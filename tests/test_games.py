@@ -572,6 +572,7 @@ def test_player_can_view_game_players(api_client, users, game):
 
 @pytest.mark.django_db
 def test_unauthenticated_user_cannot_view_game_players(api_client, game):
+    api_client.force_authenticate(user=None)
     response = api_client.get(f'/api/game/{game.id}/players/')
     assert response.status_code == 401
 
