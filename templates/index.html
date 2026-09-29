@@ -12,10 +12,23 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/">PlayLink</a>
-        <div class="d-flex align-items-center gap-2">
-            <span id="user-name" class="text-white small"></span>
-            <button id="logout-btn" class="btn btn-outline-light btn-sm d-none">Logout</button>
+        <a class="navbar-brand fw-bold" href="#" id="navbar-home-link">PlayLink</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#playlink-navbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="playlink-navbar">
+            <div id="app-nav-menu" class="navbar-nav me-auto ms-lg-4 d-none">
+                <button class="nav-link nav-menu-button" id="nav-home-btn" type="button">Home</button>
+                <button class="nav-link nav-menu-button" id="nav-status-btn" type="button">Game status</button>
+                <button class="nav-link nav-menu-button" id="nav-create-btn" type="button">Create game</button>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span id="user-name" class="text-white small"></span>
+                <button id="logout-btn" class="btn btn-outline-light btn-sm d-none">Logout</button>
+            </div>
         </div>
     </div>
 </nav>
@@ -138,7 +151,7 @@
             <div>
                 <p class="dashboard-eyebrow mb-1">PLAYLINK DASHBOARD</p>
                 <h1 class="dashboard-title mb-1">Welcome, <span id="dashboard-user-name"></span></h1>
-                <p id="profile-summary" class="text-muted mb-0"></p>
+                <p id="profile-summary" class="text-muted mb-0 d-none"></p>
             </div>
             <div class="d-flex gap-2">
                 <button id="create-game-shortcut" class="btn btn-primary">Create game</button>
@@ -170,7 +183,7 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div id="games-section-header" class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h2 class="mb-1">Find a game</h2>
                 <p class="text-muted mb-0">Browse games and find players near you.</p>
