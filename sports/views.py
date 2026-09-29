@@ -18,6 +18,7 @@ class SportView(generics.ListAPIView):
         responses={
             200: SportSerializer(many=True),
         },
+        auth=[],
         tags=["Sports"],
     )
     def get(self, request, *args, **kwargs):
