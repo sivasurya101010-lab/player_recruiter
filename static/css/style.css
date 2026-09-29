@@ -576,6 +576,38 @@ body {
     font-size: 12px;
 }
 
+.dashboard-games-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 8px 0 16px;
+}
+
+.dashboard-games-heading h2 {
+    margin: 0;
+    color: #17212b;
+    font-size: 22px;
+    font-weight: 750;
+}
+
+.dashboard-games-heading span {
+    color: #8295a3;
+    font-size: 13px;
+}
+
+@media (max-width: 575px) {
+    .dashboard-games-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .dashboard-header .btn {
+        width: 100%;
+    }
+}
+
 @media (max-width: 767px) {
     .dashboard-header {
         align-items: flex-start;
