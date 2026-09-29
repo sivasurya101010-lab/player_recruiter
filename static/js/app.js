@@ -4,6 +4,7 @@ const state = {
     access: localStorage.getItem('playerRecruiterAccess'),
     refresh: localStorage.getItem('playerRecruiterRefresh'),
     user: null,
+    profile: null,
     sports: [],
     exploreSport: '',
     exploreGames: [],
@@ -90,7 +91,9 @@ function escapeHtml(value) {
 
 async function apiFetch(path, options = {}, retry = true) {
     const headers = new Headers(options.headers || {});
-    headers.set('Content-Type', 'application/json');
+    if (!options.isFormData) {
+        headers.set('Content-Type', 'application/json');
+    }
 
     if (state.access) {
         headers.set('Authorization', `Bearer ${state.access}`);
@@ -195,6 +198,7 @@ async function loadApp() {
     $('app-section').classList.remove('d-none');
     $('dashboard-section').classList.add('d-none');
     $('create-section').classList.add('d-none');
+    $('profile-section').classList.add('d-none');
     $('menu-btn').classList.remove('d-none');
     $('app-nav-menu').classList.remove('d-none');
     $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
@@ -935,6 +939,7 @@ async function logout() {
     $('app-section').classList.add('d-none');
     $('dashboard-section').classList.add('d-none');
     $('create-section').classList.add('d-none');
+    $('profile-section').classList.add('d-none');
     $('menu-btn').classList.add('d-none');
     $('app-nav-menu').classList.add('d-none');
     $('dashboard-user-name').textContent = '';
@@ -979,8 +984,116 @@ function closePlayLinkMenu() {
     }
 }
 
+
+function getProfileDisplayName(profile) {
+    const fullName = [profile?.first_name, profile?.last_name]
+        .filter(Boolean)
+        .join(' ')
+        .trim();
+    return fullName || profile?.username || 'Player';
+}
+
+function renderProfile(profile) {
+    state.profile = profile;
+    const name = getProfileDisplayName(profile);
+    const initials = name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join('') || '?';
+
+    $('profile-page-name').textContent = name;
+    $('profile-page-username').textContent = '@' + (profile.username || 'player');
+
+    const avatar = profile.profile_picture
+        ? `<img src="${escapeHtml(profile.profile_picture)}" alt="" class="profile-page-avatar-image">`
+        : `<span>${escapeHtml(initials)}</span>`;
+
+    $('profile-page-avatar').innerHTML = avatar;
+    $('profile-upload-avatar').innerHTML = avatar;
+    $('profile-first-name').value = profile.first_name || '';
+    $('profile-last-name').value = profile.last_name || '';
+    $('profile-email').value = profile.email || '';
+    $('profile-location').value = profile.location || '';
+    $('profile-bio').value = profile.bio || '';
+}
+
+function showProfileMessage(message, type = 'danger') {
+    const box = $('profile-form-message');
+    box.className = `alert alert-${type}`;
+    box.textContent = message;
+}
+
+function clearProfileMessage() {
+    const box = $('profile-form-message');
+    box.className = 'alert d-none';
+    box.textContent = '';
+}
+
+async function showProfile() {
+    $('app-section').classList.add('d-none');
+    $('dashboard-section').classList.add('d-none');
+    $('create-section').classList.add('d-none');
+    $('profile-section').classList.remove('d-none');
+    clearProfileMessage();
+
+    try {
+        const profile = await apiFetch('/auth/me/');
+        renderProfile(profile);
+    } catch (error) {
+        showProfileMessage(error.message);
+    }
+
+    closePlayLinkMenu();
+}
+
+async function saveProfile(event) {
+    event.preventDefault();
+    clearProfileMessage();
+
+    const button = $('profile-save-btn');
+    const data = new FormData();
+    const file = $('profile-picture').files[0];
+
+    data.append('first_name', $('profile-first-name').value.trim());
+    data.append('last_name', $('profile-last-name').value.trim());
+    data.append('email', $('profile-email').value.trim());
+    data.append('location', $('profile-location').value.trim());
+    data.append('bio', $('profile-bio').value.trim());
+
+    if (file) {
+        data.append('profile_picture', file);
+    }
+
+    button.disabled = true;
+    button.textContent = 'Saving...';
+
+    try {
+        const updatedProfile = await apiFetch('/auth/me/', {
+            method: 'PATCH',
+            body: data,
+            isFormData: true
+        });
+
+        state.user = updatedProfile;
+        renderProfile(updatedProfile);
+        $('profile-picture').value = '';
+        $('dashboard-user-name').textContent =
+            updatedProfile.first_name || updatedProfile.username;
+        showProfileMessage('Profile updated successfully.', 'success');
+        showAlert('Profile updated successfully.', 'success');
+    } catch (error) {
+        showProfileMessage(error.message);
+    } finally {
+        button.disabled = false;
+        button.textContent = 'Save changes';
+    }
+}
+
 function showHome() {
     $('app-section').classList.remove('d-none');
+    $('profile-section').classList.add('d-none');
     $('dashboard-section').classList.add('d-none');
     $('create-section').classList.add('d-none');
     loadGames().catch((error) => showAlert(error.message, 'danger'));
@@ -989,6 +1102,7 @@ function showHome() {
 
 async function showDashboard() {
     $('app-section').classList.add('d-none');
+    $('profile-section').classList.add('d-none');
     $('dashboard-section').classList.remove('d-none');
     $('create-section').classList.add('d-none');
 
@@ -1003,6 +1117,7 @@ async function showDashboard() {
 
 function showCreateGamePage() {
     $('app-section').classList.add('d-none');
+    $('profile-section').classList.add('d-none');
     $('dashboard-section').classList.add('d-none');
     $('create-section').classList.remove('d-none');
     clearCreateGameError();
@@ -1018,7 +1133,13 @@ $('navbar-home-link').addEventListener('click', (event) => {
 $('nav-home-btn').addEventListener('click', showHome);
 $('nav-dashboard-btn').addEventListener('click', showDashboard);
 $('nav-create-btn').addEventListener('click', showCreateGamePage);
+$('nav-profile-btn').addEventListener('click', showProfile);
 $('nav-logout-btn').addEventListener('click', logout);
+$('profile-form').addEventListener('submit', saveProfile);
+$('profile-cancel-btn').addEventListener('click', () => {
+    renderProfile(state.profile || state.user || {});
+    clearProfileMessage();
+});
 
 $('show-register-btn').addEventListener('click', showRegisterPanel);
 $('show-login-btn').addEventListener('click', showLoginPanel);
