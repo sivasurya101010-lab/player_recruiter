@@ -1,10 +1,12 @@
 from rest_framework import serializers
-from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.password_validation import validate_password as django_validate_password
 from .models import User
 
 from rest_framework_simplejwt.serializers import TokenBlacklistSerializer
 
 class UserSerializer(serializers.ModelSerializer):
+
+    password = serializers.CharField(write_only=True, validators=[django_validate_password])
 
     class Meta:
         model=User
@@ -19,10 +21,10 @@ class UserSerializer(serializers.ModelSerializer):
             'bio',
             'location',]
 
-        extra_kwargs={'password':{'write_only':True},  'validators': [validate_password]}
+        extra_kwargs={'password': {'write_only': True}}
 
     def validate_password(self, value):
-        validate_password(value)
+        django_validate_password(value)
         return value
 
     def validate_email(self, value):
