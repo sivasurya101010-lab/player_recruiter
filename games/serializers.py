@@ -56,7 +56,18 @@ class GameSerializer(serializers.ModelSerializer):
 
     def validate(self, values):
 
-        sport = values.get('sport')
+        players_needed = values.get('players_needed')
+
+        if self.instance and players_needed is not None:
+            current_players = self.instance.participation.count()
+
+            if players_needed < current_players:
+                raise serializers.ValidationError({
+                    'players_needed':
+                        'Players needed cannot be less than the current number of players.'
+                })
+
+        sport = values.get('sport') or getattr(self.instance, 'sport', None)
         custom_sport_name = values.get('custom_sport_name', '').strip()
 
         if sport.name == 'Other' and not custom_sport_name:
