@@ -51,6 +51,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'profile_picture',
             'bio',
             'location',
+            'phone_number',
         ]
         read_only_fields = ['id', 'username']
 
