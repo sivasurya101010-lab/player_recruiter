@@ -1018,6 +1018,7 @@ function renderProfile(profile) {
     $('profile-last-name').value = profile.last_name || '';
     $('profile-email').value = profile.email || '';
     $('profile-location').value = profile.location || '';
+    $('profile-phone').value = profile.phone_number || '';
     $('profile-bio').value = profile.bio || '';
 }
 
@@ -1062,6 +1063,7 @@ async function saveProfile(event) {
     data.append('last_name', $('profile-last-name').value.trim());
     data.append('email', $('profile-email').value.trim());
     data.append('location', $('profile-location').value.trim());
+    data.append('phone_number', $('profile-phone').value.trim());
     data.append('bio', $('profile-bio').value.trim());
 
     if (file) {
