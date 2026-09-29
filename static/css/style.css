@@ -874,6 +874,79 @@ body {
 }
 
 
+/* FIND A GAME - combined heading and filter card */
+.find-game-card {
+    margin-bottom: 24px;
+    padding: 20px 16px 16px;
+    border: 1px solid #e8edf1;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(25, 45, 60, 0.07);
+}
+
+.find-game-header {
+    margin-bottom: 18px;
+}
+
+.find-game-header h2 {
+    margin: 0 0 2px;
+    color: #17212b;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.7px;
+    line-height: 1.15;
+}
+
+.find-game-header p {
+    margin: 0;
+    color: #64717a;
+    font-size: 15px;
+}
+
+.find-game-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.find-game-filter .form-label {
+    margin-bottom: 7px;
+    color: #202830;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.find-game-filter .form-control,
+.find-game-filter .form-select {
+    min-height: 38px;
+    border-color: #dfe5e9;
+    border-radius: 8px;
+    color: #28343d;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.find-game-filter .form-control:focus,
+.find-game-filter .form-select:focus {
+    border-color: #aebbc4;
+    box-shadow: 0 0 0 2px rgba(8, 121, 201, 0.08);
+}
+
+@media (max-width: 767px) {
+    .find-game-card {
+        padding: 18px 14px 14px;
+    }
+
+    .find-game-header h2 {
+        font-size: 27px;
+    }
+
+    .find-game-filters {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
 /* EXPLORE GAMES - horizontal discovery layout */
 .explore-games-section {
     margin-top: 8px;
