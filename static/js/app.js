@@ -173,11 +173,10 @@ async function loadApp() {
     $('auth-section').classList.add('d-none');
     $('app-section').classList.remove('d-none');
     $('logout-btn').classList.remove('d-none');
+    $('app-nav-menu').classList.remove('d-none');
     $('user-name').textContent = state.user.username;
     $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
-    $('profile-summary').textContent =
-        [state.user.first_name, state.user.last_name].filter(Boolean).join(' ') ||
-        state.user.email;
+    $('profile-summary').textContent = '';
 
     await loadSports();
     await loadGames();
@@ -511,6 +510,7 @@ async function logout() {
     $('auth-section').classList.remove('d-none');
     $('app-section').classList.add('d-none');
     $('logout-btn').classList.add('d-none');
+    $('app-nav-menu').classList.add('d-none');
     $('user-name').textContent = '';
 }
 
@@ -536,6 +536,32 @@ function showLoginPanel() {
     $('login-panel').classList.remove('d-none');
     $('alert-box').innerHTML = '';
 }
+
+
+
+function scrollToSection(id) {
+    $(id)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
+}
+
+$('navbar-home-link').addEventListener('click', (event) => {
+    event.preventDefault();
+    scrollToSection('app-section');
+});
+
+$('nav-home-btn').addEventListener('click', () => {
+    scrollToSection('app-section');
+});
+
+$('nav-status-btn').addEventListener('click', () => {
+    scrollToSection('games-section-header');
+});
+
+$('nav-create-btn').addEventListener('click', () => {
+    scrollToCreateGame();
+});
 
 $('show-register-btn').addEventListener('click', showRegisterPanel);
 $('show-login-btn').addEventListener('click', showLoginPanel);
