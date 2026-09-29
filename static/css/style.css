@@ -1329,17 +1329,26 @@ body {
 
 .game-details-modal {
     border: 0;
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: hidden;
+    box-shadow: 0 20px 55px rgba(20, 35, 45, 0.18);
 }
 
 .game-details-modal .modal-header {
-    padding: 20px 22px 16px;
+    padding: 22px 24px 18px;
     border-bottom: 1px solid #edf1f4;
+    background: #ffffff;
 }
 
-.game-details-modal .modal-body {
-    padding: 20px 22px 24px;
+.game-details-modal-heading {
+    min-width: 0;
+}
+
+.game-details-modal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 6px;
 }
 
 .game-details-modal-sport {
@@ -1350,31 +1359,130 @@ body {
     text-transform: uppercase;
 }
 
+.game-details-modal-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+}
+
+.game-details-modal-status.badge-open {
+    background: #e8f7ef;
+    color: #16804d;
+}
+
+.game-details-modal-status.badge-full {
+    background: #fff3df;
+    color: #a86500;
+}
+
+.game-details-modal-status.badge-cancelled {
+    background: #fdecec;
+    color: #b42318;
+}
+
+.game-details-modal-status.badge-completed {
+    background: #eaf0ff;
+    color: #3659a8;
+}
+
 .game-details-modal .modal-title {
     color: #17212b;
-    font-size: 22px;
+    font-size: 23px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.game-details-modal .modal-body {
+    padding: 22px 24px 10px;
+    background: #ffffff;
+}
+
+.game-details-quick-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.game-details-quick-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid #e8edf1;
+    border-radius: 12px;
+    background: #f9fbfc;
+}
+
+.game-details-quick-icon {
+    flex-shrink: 0;
+    font-size: 17px;
+    line-height: 1.3;
+}
+
+.game-details-quick-item > div {
+    min-width: 0;
+}
+
+.game-details-quick-label {
+    display: block;
+    margin-bottom: 3px;
+    color: #8797a2;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.game-details-quick-item strong {
+    display: block;
+    overflow: hidden;
+    color: #26343d;
+    font-size: 13px;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+}
+
+.game-details-section {
+    margin-bottom: 21px;
+}
+
+.game-details-section h6 {
+    margin: 0 0 9px;
+    color: #26343d;
+    font-size: 14px;
     font-weight: 800;
 }
 
 .game-details-modal-description {
-    margin-bottom: 18px;
+    margin: 0;
     color: #68757e;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.55;
 }
 
 .game-details-modal-list {
-    border-top: 1px solid #edf1f4;
+    overflow: hidden;
+    border: 1px solid #e8edf1;
+    border-radius: 12px;
 }
 
 .game-detail-modal-row {
     display: flex;
     justify-content: space-between;
     gap: 20px;
-    padding: 11px 0;
+    padding: 11px 14px;
     border-bottom: 1px solid #edf1f4;
     color: #344954;
     font-size: 14px;
+}
+
+.game-detail-modal-row:last-child {
+    border-bottom: 0;
 }
 
 .game-detail-modal-label {
@@ -1383,11 +1491,113 @@ body {
     font-weight: 600;
 }
 
+.game-details-creator-section {
+    padding-top: 1px;
+}
+
+.game-details-creator {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.game-details-creator-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #e9f3f8;
+    color: #0879c9;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.game-details-creator strong,
+.game-details-creator span {
+    display: block;
+}
+
+.game-details-creator strong {
+    color: #26343d;
+    font-size: 14px;
+}
+
+.game-details-creator span {
+    margin-top: 2px;
+    color: #8797a2;
+    font-size: 12px;
+}
+
+.game-details-created-at {
+    margin-top: 9px;
+    color: #8797a2;
+    font-size: 12px;
+}
+
+.game-details-created-at span {
+    color: #53636e;
+    font-weight: 600;
+}
+
+.game-details-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 24px 20px;
+    border-top: 0;
+    background: #ffffff;
+}
+
+.game-details-modal-footer #game-details-action {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.game-details-modal-footer .btn {
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+@media (max-width: 767px) {
+    .game-details-quick-info {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 575px) {
-    .game-details-modal .modal-header,
+    .game-details-modal {
+        border-radius: 16px;
+    }
+
+    .game-details-modal .modal-header {
+        padding: 18px 17px 15px;
+    }
+
     .game-details-modal .modal-body {
-        padding-left: 17px;
-        padding-right: 17px;
+        padding: 18px 17px 6px;
+    }
+
+    .game-details-modal-footer {
+        align-items: stretch;
+        flex-direction: column-reverse;
+        padding: 12px 17px 17px;
+    }
+
+    .game-details-modal-footer .btn {
+        width: 100%;
+    }
+
+    .game-details-modal-footer #game-details-action {
+        width: 100%;
+    }
+
+    .game-details-modal-footer #game-details-action .btn {
+        width: 100%;
     }
 
     .game-detail-modal-row {
