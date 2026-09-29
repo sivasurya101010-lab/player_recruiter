@@ -174,6 +174,7 @@ async function loadApp() {
     $('app-section').classList.remove('d-none');
     $('logout-btn').classList.remove('d-none');
     $('user-name').textContent = state.user.username;
+    $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
     $('profile-summary').textContent =
         [state.user.first_name, state.user.last_name].filter(Boolean).join(' ') ||
         state.user.email;
@@ -278,9 +279,31 @@ async function loadGames() {
     const query = params.toString();
     const games = await apiFetch('/game/' + (query ? '?' + query : ''));
 
+    updateDashboardStats(games);
+
     $('games-list').innerHTML = games.length
         ? games.map(gameCard).join('')
         : '<div class="col-12"><div class="alert alert-light border">No games found for these filters.</div></div>';
+}
+
+function updateDashboardStats(games) {
+    const availableGames = games.filter(
+        (game) => game.status === 'OPEN' && game.available_slots > 0
+    ).length;
+
+    const joinedGames = games.filter((game) => game.is_joined).length;
+    const createdGames = games.filter((game) => game.is_creator).length;
+
+    $('stat-available-games').textContent = availableGames;
+    $('stat-joined-games').textContent = joinedGames;
+    $('stat-created-games').textContent = createdGames;
+}
+
+function scrollToCreateGame() {
+    document.getElementById('game-form')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
 }
 
 async function joinGame(id) {
@@ -525,6 +548,7 @@ $('register-form').addEventListener('submit', async (event) => {
 $('game-form').addEventListener('submit', createGame);
 $('edit-game-form').addEventListener('submit', saveGameEdit);
 $('refresh-btn').addEventListener('click', loadGames);
+$('create-game-shortcut').addEventListener('click', scrollToCreateGame);
 $('filter-sport').addEventListener('change', loadGames);
 $('filter-date').addEventListener('change', loadGames);
 $('filter-status').addEventListener('change', loadGames);
