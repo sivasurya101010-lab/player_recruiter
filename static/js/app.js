@@ -257,8 +257,7 @@ function gameCard(game) {
                     <div class="game-meta mb-3">
                         <div>📅 ${escapeHtml(game.date)} at ${escapeHtml(game.start_time)}</div>
                         <div>📍 ${escapeHtml(game.location)}</div>
-                        <div>👥 ${game.current_players}/${game.players_needed} players · ${game.available_slots} slots left</div>
-                        <div>⏱ ${game.duration} minutes</div>
+                        <div>👥 ${game.current_players}/${game.players_needed} players · ${game.available_slots} slots left</div>                        <div>⏱ ${game.duration} minutes</div>
                     </div>
                     <div class="d-flex flex-wrap gap-2 mt-auto">
                         ${actionButtons}
@@ -300,10 +299,24 @@ function updateDashboardStats(games) {
 }
 
 function scrollToCreateGame() {
-    document.getElementById('game-form')?.scrollIntoView({
+    document.getElementById('create-game-card')?.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
     });
+
+    setTimeout(() => $('game-title')?.focus(), 500);
+}
+
+function clearCreateGameError() {
+    const box = $('create-game-errors');
+    box.classList.add('d-none');
+    box.textContent = '';
+}
+
+function showCreateGameError(message) {
+    const box = $('create-game-errors');
+    box.textContent = message;
+    box.classList.remove('d-none');
 }
 
 async function joinGame(id) {
@@ -442,6 +455,11 @@ async function deleteGame(id) {
 
 async function createGame(event) {
     event.preventDefault();
+    clearCreateGameError();
+
+    const button = $('create-game-btn');
+    button.disabled = true;
+    button.textContent = 'Creating...';
 
     const data = {
         sport: Number($('game-sport').value),
@@ -465,8 +483,13 @@ async function createGame(event) {
         $('game-form').reset();
         $('custom-sport-wrap').classList.add('d-none');
         await loadGames();
+        $('create-game-card')?.scrollIntoView({behavior: 'smooth', block: 'start'});
     } catch (error) {
+        showCreateGameError(error.message);
         showAlert(error.message, 'danger');
+    } finally {
+        button.disabled = false;
+        button.textContent = 'Create game';
     }
 }
 
@@ -546,6 +569,12 @@ $('register-form').addEventListener('submit', async (event) => {
 });
 
 $('game-form').addEventListener('submit', createGame);
+
+const today = new Date().toISOString().split('T')[0];
+$('game-date').min = today;
+$('edit-game-date').min = today;
+
+$('game-form').addEventListener('input', clearCreateGameError);
 $('edit-game-form').addEventListener('submit', saveGameEdit);
 $('refresh-btn').addEventListener('click', loadGames);
 $('create-game-shortcut').addEventListener('click', scrollToCreateGame);
