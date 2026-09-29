@@ -19,6 +19,8 @@ class GameSerializer(serializers.ModelSerializer):
 
     current_players = serializers.SerializerMethodField()
     available_slots = serializers.SerializerMethodField()
+    is_joined = serializers.SerializerMethodField()
+    is_creator = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
@@ -37,6 +39,18 @@ class GameSerializer(serializers.ModelSerializer):
 
     def get_available_slots(self, values):
         return max(0, values.players_needed - values.participation.count())
+
+    def get_is_joined(self, values):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return values.participation.filter(user=request.user).exists()
+
+    def get_is_creator(self, values):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return values.creator_id == request.user.id
 
     def validate_players_needed(self, value):
 
