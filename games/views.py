@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from .models import Game, GamePlayer
 from .serializers import GameSerializer
+from users.models import User
 from users.serializers import UserSerializer
 
 
@@ -219,4 +220,4 @@ class GamePlayersView(generics.ListAPIView):
 
     def get_queryset(self):
         game = generics.get_object_or_404(Game, pk=self.kwargs['pk'])
-        return game.participation.select_related('user').values_list('user', flat=True)
+        return User.objects.filter(joined_games__game=game).order_by('username')
