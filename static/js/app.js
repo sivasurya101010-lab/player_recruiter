@@ -151,6 +151,7 @@ function clearTokens() {
     state.access = null;
     state.refresh = null;
     state.user = null;
+    state.profile = null;
     localStorage.removeItem('playerRecruiterAccess');
     localStorage.removeItem('playerRecruiterRefresh');
 }
@@ -968,6 +969,7 @@ function showLoginPanel() {
     $('app-section').classList.add('d-none');
     $('dashboard-section').classList.add('d-none');
     $('create-section').classList.add('d-none');
+    $('profile-section').classList.add('d-none');
     $('menu-btn').classList.add('d-none');
     $('app-nav-menu').classList.add('d-none');
     $('register-panel').classList.add('d-none');
