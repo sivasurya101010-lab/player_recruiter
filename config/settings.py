@@ -102,6 +102,5 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API documentation for the PlayLink sports player recruitment platform.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    'SECURITY': [{'bearerAuth': []}],
     'COMPONENT_SPLIT_REQUEST': True,
 }
