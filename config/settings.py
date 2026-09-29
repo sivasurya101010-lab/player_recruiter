@@ -1,12 +1,22 @@
 from pathlib import Path
 import os
+
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-only-change-me")
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "dev-only-change-me"
+    else:
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY must be set when DJANGO_DEBUG=False."
+        )
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -14,16 +24,21 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
-if not DEBUG:
-    SECURE_SSL_REDIRECT = os.getenv("DJANGO_SECURE_SSL_REDIRECT", "True").lower() == "true"
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "31536000"))
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = "DENY"
-    SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+SECURE_SSL_REDIRECT = os.getenv(
+    "DJANGO_SECURE_SSL_REDIRECT", "True" if not DEBUG else "False"
+).lower() == "true"
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_HSTS_SECONDS = int(
+    os.getenv("DJANGO_SECURE_HSTS_SECONDS", "31536000" if not DEBUG else "0")
+)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
+X_FRAME_OPTIONS = "DENY" if not DEBUG else "SAMEORIGIN"
+SECURE_REFERRER_POLICY = (
+    "strict-origin-when-cross-origin" if not DEBUG else "same-origin"
+)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
