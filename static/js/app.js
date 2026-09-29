@@ -190,11 +190,18 @@ async function loadApp() {
     $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
 
     // Data-loading errors must not log the user out.
+    // Load Home data independently. A problem loading the sport filter
+    // must not prevent recently added games from appearing.
     try {
         await loadSports();
+    } catch (error) {
+        showAlert(error.message || 'Could not load sports.', 'danger');
+    }
+
+    try {
         await loadGames();
     } catch (error) {
-        showAlert(error.message || 'Could not load PlayLink data. Please try again.', 'danger');
+        showAlert(error.message || 'Could not load recently added games.', 'danger');
     }
 }
 
@@ -561,6 +568,7 @@ async function createGame(event) {
         showAlert('Game created successfully.', 'success');
         $('game-form').reset();
         $('custom-sport-wrap').classList.add('d-none');
+        await loadGames();
     } catch (error) {
         showCreateGameError(error.message);
         showAlert(error.message, 'danger');
