@@ -11,22 +11,20 @@
 <body>
 
 <nav class="navbar navbar-dark bg-dark sticky-top">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="#" id="navbar-home-link">PlayLink</a>
+    <div class="container position-relative">
+        <button
+            id="menu-btn"
+            type="button"
+            class="nav-menu-button d-none"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#playlink-menu"
+            aria-controls="playlink-menu"
+            aria-label="Open PlayLink menu"
+        >
+            <span aria-hidden="true">☰</span>
+        </button>
 
-        <div class="d-flex align-items-center gap-2">
-            <button
-                id="menu-btn"
-                type="button"
-                class="btn btn-outline-light btn-sm d-none"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#playlink-menu"
-                aria-controls="playlink-menu"
-            >
-                Menu
-            </button>
-            <button id="logout-btn" class="btn btn-outline-light btn-sm d-none">Logout</button>
-        </div>
+        <a class="navbar-brand fw-bold position-absolute start-50 translate-middle-x" href="#" id="navbar-home-link">PlayLink</a>
     </div>
 </nav>
 
@@ -169,7 +167,6 @@
                 <p class="dashboard-eyebrow mb-1">PLAYLINK HOME</p>
                 <h1 class="dashboard-title mb-1">Welcome, <span id="dashboard-user-name"></span></h1>
             </div>
-            <button id="refresh-btn" class="btn btn-outline-primary">Refresh</button>
         </div>
 
         <div id="games-section-header" class="mb-3">
@@ -221,7 +218,6 @@
                 <h1 class="dashboard-title mb-1">PlayLink Dashboard</h1>
                 <p class="text-muted mb-0">Games you have joined.</p>
             </div>
-            <button id="dashboard-refresh-btn" class="btn btn-outline-primary">Refresh</button>
         </div>
 
         <div id="joined-games-list" class="row g-4"></div>
