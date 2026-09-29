@@ -862,3 +862,13 @@ body {
     color: #a93226;
     background: #fff5f4;
 }
+
+
+.session-loading {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 1rem;
+}
