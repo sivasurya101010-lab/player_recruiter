@@ -179,6 +179,14 @@ async function register() {
 async function loadApp() {
     state.user = await apiFetch('/auth/me/');
 
+    // Load the Home data before displaying the Home page. Previously the
+    // page became visible while games were still loading, which could leave
+    // the game area blank until the user clicked Home from the menu.
+    const results = await Promise.allSettled([
+        loadSports(),
+        loadGames()
+    ]);
+
     $('session-loading').classList.add('d-none');
     $('auth-section').classList.add('d-none');
     $('app-section').classList.remove('d-none');
@@ -188,11 +196,6 @@ async function loadApp() {
     $('app-nav-menu').classList.remove('d-none');
     $('user-name').textContent = state.user.username;
     $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
-
-    const results = await Promise.allSettled([
-        loadSports(),
-        loadGames()
-    ]);
 
     if (results[0].status === 'rejected') {
         showAlert(results[0].reason?.message || 'Could not load sports.', 'danger');
