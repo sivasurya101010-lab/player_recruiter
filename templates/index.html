@@ -148,6 +148,38 @@
     </section>
 </main>
 
+<div class="modal fade" id="players-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 id="players-modal-title" class="modal-title">Game players</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><div id="players-list"></div></div>
+    </div></div>
+</div>
+
+<div class="modal fade" id="edit-game-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg"><div class="modal-content">
+        <form id="edit-game-form">
+            <div class="modal-header"><h5 class="modal-title">Edit game</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-game-id">
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">Title</label><input id="edit-game-title" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label">Sport</label><select id="edit-game-sport" class="form-select" required></select></div>
+                    <div id="edit-custom-sport-wrap" class="col-md-6 d-none"><label class="form-label">Custom sport</label><input id="edit-custom-sport" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Date</label><input id="edit-game-date" type="date" class="form-control" required></div>
+                    <div class="col-md-4"><label class="form-label">Start time</label><input id="edit-game-time" type="time" class="form-control" required></div>
+                    <div class="col-md-4"><label class="form-label">Duration</label><input id="edit-game-duration" type="number" min="1" class="form-control" required></div>
+                    <div class="col-md-4"><label class="form-label">Players needed</label><input id="edit-game-players" type="number" min="1" class="form-control" required></div>
+                    <div class="col-12"><label class="form-label">Location</label><input id="edit-game-location" class="form-control" required></div>
+                    <div class="col-12"><label class="form-label">Description</label><textarea id="edit-game-description" class="form-control" rows="3"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button class="btn btn-primary">Save changes</button></div>
+        </form>
+    </div></div>
+</div>
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>\n<script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>
