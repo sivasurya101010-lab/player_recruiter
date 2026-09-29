@@ -212,60 +212,69 @@ async function restoreSession() {
     $('session-loading').classList.remove('d-none');
     $('auth-section').classList.add('d-none');
 
+    // On a full page reload, use the saved refresh token first. This avoids
+    // depending on an old access token and gives us one deterministic
+    // session-restoration path.
+    if (!state.refresh) {
+        try {
+            await loadApp();
+            return;
+        } catch (error) {
+            clearTokens();
+            showLoginPanel();
+            showAlert('Your saved login session has expired. Please log in again.', 'danger');
+            return;
+        }
+    }
+
     try {
-        // apiFetch refreshes an expired access token once before failing.
-        await loadApp();
-    } catch (error) {
-        if (!state.refresh) {
+        const refreshResponse = await fetch(API + '/auth/refresh/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({refresh: state.refresh})
+        });
+
+        if (!refreshResponse.ok) {
             clearTokens();
             showLoginPanel();
             showAlert('Your saved login session has expired. Please log in again.', 'danger');
             return;
         }
 
-        try {
-            const refreshResponse = await fetch(API + '/auth/refresh/', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({refresh: state.refresh})
-            });
+        const data = await refreshResponse.json();
 
-            if (!refreshResponse.ok) {
-                clearTokens();
-                showLoginPanel();
-                showAlert('Your saved login session has expired. Please log in again.', 'danger');
-                return;
-            }
-
-            const data = await refreshResponse.json();
-
-            if (!data.access) {
-                throw new Error('Refresh response did not contain an access token.');
-            }
-
-            state.access = data.access;
-            localStorage.setItem('playerRecruiterAccess', data.access);
-
-            if (data.refresh) {
-                state.refresh = data.refresh;
-                localStorage.setItem('playerRecruiterRefresh', data.refresh);
-            }
-
-            await loadApp();
-        } catch (refreshError) {
-            // Do not destroy tokens on a transient network/server error.
-            if (refreshError instanceof TypeError) {
-                $('session-loading').classList.add('d-none');
-                showAlert('Could not restore your session. Check your connection and refresh again.', 'danger');
-                return;
-            }
-
-            clearTokens();
-            showLoginPanel();
-            showAlert('Your saved login session has expired. Please log in again.', 'danger');
+        if (!data.access) {
+            throw new Error('Refresh response did not contain an access token.');
         }
+
+        state.access = data.access;
+        localStorage.setItem('playerRecruiterAccess', data.access);
+
+        if (data.refresh) {
+            state.refresh = data.refresh;
+            localStorage.setItem('playerRecruiterRefresh', data.refresh);
+        }
+
+        // Only after the new access token is stored do we request the profile
+        // and recent games.
+        await loadApp();
+    } catch (error) {
+        if (error instanceof TypeError) {
+            $('session-loading').classList.add('d-none');
+            showLoginPanel();
+            showAlert(
+                'PlayLink could not reach the server. Make sure the Django server is running and refresh again.',
+                'danger'
+            );
+            return;
+        }
+
+        clearTokens();
+        showLoginPanel();
+        showAlert('Your saved login session has expired. Please log in again.', 'danger');
     }
 }
+
 
 async function loadSports() {
     state.sports = await apiFetch('/sports/');
