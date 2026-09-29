@@ -1983,3 +1983,38 @@ body {
         height: 43px;
     }
 }
+
+
+/* Phase 2 - Profile page */
+#profile-section { padding-bottom: 30px; }
+.profile-page-card { overflow: hidden; border: 1px solid #e0e8ee; border-radius: 18px; background: #fff; box-shadow: 0 4px 16px rgba(25,45,60,.06); }
+.profile-page-top { display:flex; align-items:center; gap:16px; padding:24px; background:#f8fbfc; border-bottom:1px solid #edf1f4; }
+.profile-page-avatar,.profile-upload-avatar { display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:50%; background:#e8f3f8; color:#0879c9; font-weight:800; }
+.profile-page-avatar { width:72px; height:72px; flex:0 0 72px; font-size:25px; }
+.profile-page-avatar-image,.profile-upload-avatar-image { width:100%; height:100%; object-fit:cover; }
+.profile-page-eyebrow { color:#0879c9; font-size:11px; font-weight:800; letter-spacing:.8px; }
+.profile-page-top h2 { margin:2px 0 1px; color:#17212b; font-size:23px; font-weight:800; }
+.profile-page-top p { margin:0; color:#758590; font-size:13px; }
+.profile-form { padding:24px; }
+.profile-form-section { padding-bottom:24px; margin-bottom:24px; border-bottom:1px solid #edf1f4; }
+.profile-form-section-last { margin-bottom:0; border-bottom:0; }
+.profile-form-heading { display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:14px; }
+.profile-form-heading strong { color:#26343d; font-size:15px; font-weight:800; }
+.profile-form-heading span,.profile-field-help { color:#8a9aa5; font-size:12px; }
+.profile-form .form-label { margin-bottom:6px; color:#33434d; font-size:13px; font-weight:700; }
+.profile-form .form-control { min-height:43px; border-color:#dce5ea; border-radius:9px; font-size:14px; box-shadow:none; }
+.profile-form .form-control:focus { border-color:#0879c9; box-shadow:0 0 0 3px rgba(8,121,201,.08); }
+.profile-form textarea.form-control { min-height:100px; resize:vertical; }
+.profile-field-help { margin-top:6px; }
+.profile-picture-upload { display:flex; align-items:center; gap:16px; }
+.profile-upload-avatar { width:58px; height:58px; flex:0 0 58px; font-size:19px; }
+.profile-upload-controls { flex:1; }
+.profile-form-actions { display:flex; justify-content:flex-end; gap:10px; }
+.profile-form-actions .btn { min-height:42px; min-width:120px; border-radius:9px; font-size:13px; font-weight:700; }
+@media (max-width:575px) {
+    .profile-page-top,.profile-form { padding:20px; }
+    .profile-form-heading { align-items:flex-start; flex-direction:column; gap:3px; }
+    .profile-picture-upload { align-items:flex-start; flex-direction:column; }
+    .profile-form-actions { flex-direction:column-reverse; }
+    .profile-form-actions .btn { width:100%; }
+}
