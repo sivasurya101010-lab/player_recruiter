@@ -712,6 +712,34 @@ body {
 }
 
 
+/* Phase 2 - Mobile-style navbar */
+.nav-menu-button {
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 22px;
+    line-height: 1;
+    padding: 8px 10px !important;
+    cursor: pointer;
+}
+
+.nav-menu-button:hover,
+.nav-menu-button:focus {
+    color: #ffffff !important;
+    outline: none;
+}
+
+.navbar .container {
+    min-height: 42px;
+}
+
+@media (max-width: 575px) {
+    .nav-menu-button {
+        font-size: 21px;
+    }
+}
+
+
 /* Phase 2 - Clean left navigation */
 .nav-menu-button {
     border: 0;
