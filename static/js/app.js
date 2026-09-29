@@ -422,18 +422,30 @@ function formatCreatedAt(value) {
     });
 }
 
-function exploreGameCard(game) {
-    const sportName = game.sport_details?.name === 'Other' && game.custom_sport_name
+function getCreatorName(creator) {
+    return [creator?.first_name, creator?.last_name]
+        .filter(Boolean)
+        .join(' ') || creator?.username || 'Unknown player';
+}
+
+function getGameSportName(game) {
+    return game.sport_details?.name === 'Other' && game.custom_sport_name
         ? game.custom_sport_name
         : (game.sport_details?.name || 'Sport');
+}
 
-    const statusClass = {
+function getGameStatusClass(status) {
+    return {
         OPEN: 'badge-open',
         FULL: 'badge-full',
         CANCELLED: 'badge-cancelled',
         COMPLETED: 'badge-completed'
-    }[game.status] || 'badge-full';
+    }[status] || 'badge-full';
+}
 
+function exploreGameCard(game) {
+    const sportName = getGameSportName(game);
+    const statusClass = getGameStatusClass(game.status);
     const date = formatGameDate(game.date);
     const time = game.start_time ? game.start_time.slice(0, 5) : 'Time not set';
 
@@ -460,7 +472,7 @@ function exploreGameCard(game) {
     }
 
     return `
-        <article class="explore-game-card" onclick="showGameDetails(${game.id})" tabindex="0" role="button" aria-label="View details for ${escapeHtml(game.title)}">
+        <article class="explore-game-card" onclick="showGameDetails(${game.id})" onkeydown="handleGameCardKeydown(event, ${game.id})" tabindex="0" role="button" aria-label="View details for ${escapeHtml(game.title)}">
             <div class="explore-game-visual">
                 <span class="explore-game-sport-label">${escapeHtml(sportName)}</span>
                 <span class="explore-game-status ${statusClass}">${escapeHtml(game.status)}</span>
@@ -482,7 +494,7 @@ function exploreGameCard(game) {
                         class="explore-game-arrow game-card-action"
                         type="button"
                         onclick="event.stopPropagation(); showGameDetails(${game.id})"
-                        aria-label="View details for ${escapeHtml(game.title)}"
+                        aria-label="View game details"
                         title="View game details"
                     >
                         →
@@ -493,40 +505,88 @@ function exploreGameCard(game) {
     `;
 }
 
+function handleGameCardKeydown(event, id) {
+    if (event.target !== event.currentTarget) return;
+
+    if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        showGameDetails(id);
+    }
+}
+
+function getGameDetailsAction(game) {
+    if (game.is_creator) {
+        return `
+            <button type="button" class="btn btn-primary" onclick="editGame(${game.id})">
+                Manage game
+            </button>
+        `;
+    }
+
+    if (game.is_joined) {
+        return `
+            <button type="button" class="btn btn-outline-danger" onclick="leaveGame(${game.id})">
+                Leave game
+            </button>
+        `;
+    }
+
+    const canJoin = game.status === 'OPEN' && game.available_slots > 0;
+    return `
+        <button type="button" class="btn btn-primary" onclick="joinGame(${game.id})" ${canJoin ? '' : 'disabled'}>
+            ${canJoin ? 'Join game' : 'Game unavailable'}
+        </button>
+    `;
+}
+
 async function showGameDetails(id) {
     try {
         const game = await apiFetch(`/game/${id}/`);
-
         const creator = game.creator || {};
-        const creatorName = [creator.first_name, creator.last_name]
-            .filter(Boolean)
-            .join(' ') || creator.username || 'Unknown player';
-
-        const sportName = game.sport_details?.name === 'Other' && game.custom_sport_name
-            ? game.custom_sport_name
-            : (game.sport_details?.name || 'Sport');
-
-        const details = [
-            ['Created by', creatorName],
-            ['Created on', formatCreatedAt(game.created_at)],
-            ['Sport', sportName],
-            ['Date', formatGameDate(game.date)],
-            ['Time', game.start_time ? game.start_time.slice(0, 5) : 'Not set'],
-            ['Duration', game.duration ? `${game.duration} minutes` : 'Not set'],
-            ['Ground / place', game.location || 'Not set'],
-            ['Players', `${game.current_players || 0}/${game.players_needed || 0} · ${game.available_slots || 0} slots left`],
-            ['Status', game.status || 'Not set']
-        ];
+        const creatorName = getCreatorName(creator);
+        const creatorUsername = creator.username ? `@${creator.username}` : 'Game creator';
+        const sportName = getGameSportName(game);
+        const date = formatGameDate(game.date);
+        const time = game.start_time ? game.start_time.slice(0, 5) : 'Not set';
+        const currentPlayers = game.current_players || 0;
+        const playersNeeded = game.players_needed || 0;
+        const availableSlots = game.available_slots ?? Math.max(0, playersNeeded - currentPlayers);
+        const creatorInitial = creatorName.charAt(0).toUpperCase() || '?';
 
         $('game-details-title').textContent = game.title || 'Game details';
         $('game-details-sport').textContent = sportName;
-        $('game-details-description').textContent = game.description || 'No description provided.';
+        $('game-details-status').textContent = game.status || 'UNKNOWN';
+        $('game-details-status').className = `game-details-modal-status ${getGameStatusClass(game.status)}`;
+
+        $('game-details-location').textContent = game.location || 'Ground / place not set';
+        $('game-details-date').textContent = date;
+        $('game-details-time').textContent = time;
+
+        $('game-details-description').textContent =
+            game.description || 'No description was added for this game.';
+
+        const details = [
+            ['Duration', game.duration ? `${game.duration} minutes` : 'Not set'],
+            ['Players', `${currentPlayers} / ${playersNeeded}`],
+            ['Available slots', String(availableSlots)],
+            ['Status', game.status || 'Not set']
+        ];
+
         $('game-details-list').innerHTML = details.map(([label, value]) => `
             <div class="game-detail-modal-row">
                 <span class="game-detail-modal-label">${escapeHtml(label)}</span>
                 <span>${escapeHtml(value)}</span>
             </div>
         `).join('');
+
+        $('game-details-creator-avatar').textContent = creatorInitial;
+        $('game-details-creator-name').textContent = creatorName;
+        $('game-details-creator-username').textContent = creatorUsername;
+        $('game-details-created-at').textContent = formatCreatedAt(game.created_at);
+
+        $('game-details-action').innerHTML = getGameDetailsAction(game);
+
+        $('game-details-players-btn').onclick = () => showPlayers(game.id);
 
         bootstrap.Modal.getOrCreateInstance($('game-details-modal')).show();
     } catch (error) {
