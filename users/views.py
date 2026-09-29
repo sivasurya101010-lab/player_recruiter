@@ -1,10 +1,40 @@
 from rest_framework import generics
-from rest_framework_simplejwt.views import TokenBlacklistView
+from rest_framework_simplejwt.views import TokenBlacklistView, TokenObtainPairView, TokenRefreshView
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from .models import User
 from .serializers import UserSerializer, LogoutSerializer
+
+
+class LoginView(TokenObtainPairView):
+
+    @extend_schema(
+        summary="Login",
+        description="Authenticate with username and password and return access and refresh JWT tokens.",
+        responses={
+            200: OpenApiResponse(description="Access and refresh tokens returned successfully."),
+            401: OpenApiResponse(description="Invalid username or password."),
+        },
+        tags=["Authentication"],
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class RefreshTokenView(TokenRefreshView):
+
+    @extend_schema(
+        summary="Refresh access token",
+        description="Use a valid refresh token to obtain a new access token.",
+        responses={
+            200: OpenApiResponse(description="New access token returned successfully."),
+            401: OpenApiResponse(description="Invalid or expired refresh token."),
+        },
+        tags=["Authentication"],
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 
 class RegisterView(generics.CreateAPIView):
