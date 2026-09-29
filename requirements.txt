@@ -2,6 +2,7 @@ asgiref==3.12.1
 Django==6.1
 djangorestframework==3.18.0
 djangorestframework_simplejwt==5.5.1
+django-filter==25.2
 pillow==12.3.0
 psycopg==3.3.5
 PyJWT==2.13.0
