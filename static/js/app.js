@@ -523,7 +523,11 @@ async function loadJoinedGames() {
     const joinedGames = games.filter((game) => game.is_joined);
 
     $('joined-games-list').innerHTML = joinedGames.length
-        ? joinedGames.map(gameCard).join('')
+        ? joinedGames.map((game) => `
+            <div class="dashboard-game-card">
+                ${exploreGameCard(game)}
+            </div>
+        `).join('')
         : '<div class="col-12"><div class="dashboard-empty-state">No games joined yet.</div></div>';
 }
 
