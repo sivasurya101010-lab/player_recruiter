@@ -876,7 +876,7 @@ $('filter-sport').addEventListener('change', loadGames);
 $('see-more-games-btn')?.addEventListener('click', () => {
     state.showAllExploreGames = !state.showAllExploreGames;
     renderExploreGames(state.exploreGames || []);
-};
+});
 $('filter-date').addEventListener('change', loadGames);
 $('filter-status').addEventListener('change', loadGames);
 
