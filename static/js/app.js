@@ -204,12 +204,38 @@ async function restoreSession() {
     }
 
     try {
+        // Refresh the access token first on every page reload. This avoids
+        // depending on an old access token surviving the browser refresh.
+        if (state.refresh) {
+            const refreshResponse = await fetch(API + '/auth/refresh/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({refresh: state.refresh})
+            });
+
+            if (!refreshResponse.ok) {
+                throw new Error('Saved login session could not be restored.');
+            }
+
+            const data = await refreshResponse.json();
+
+            if (!data.access) {
+                throw new Error('Saved login session could not be restored.');
+            }
+
+            state.access = data.access;
+            localStorage.setItem('playerRecruiterAccess', data.access);
+
+            if (data.refresh) {
+                state.refresh = data.refresh;
+                localStorage.setItem('playerRecruiterRefresh', data.refresh);
+            }
+        }
+
         await loadApp();
     } catch (error) {
-        // apiFetch already attempts the refresh token when the access token
-        // has expired. Clear local credentials only when /auth/me/ cannot
-        // restore the authenticated session.
         clearTokens();
+        showLoginPanel();
     }
 }
 
