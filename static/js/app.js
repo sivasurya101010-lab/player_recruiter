@@ -172,11 +172,13 @@ async function loadApp() {
     state.user = await apiFetch('/auth/me/');
     $('auth-section').classList.add('d-none');
     $('app-section').classList.remove('d-none');
+    $('dashboard-section').classList.add('d-none');
+    $('create-section').classList.add('d-none');
     $('logout-btn').classList.remove('d-none');
+    $('menu-btn').classList.remove('d-none');
     $('app-nav-menu').classList.remove('d-none');
     $('user-name').textContent = state.user.username;
     $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
-    $('profile-summary').textContent = '';
 
     await loadSports();
     await loadGames();
@@ -279,24 +281,27 @@ async function loadGames() {
     const query = params.toString();
     const games = await apiFetch('/game/' + (query ? '?' + query : ''));
 
-    updateDashboardStats(games);
+    const recentGames = games.slice(0, 6);
 
-    $('games-list').innerHTML = games.length
-        ? games.map(gameCard).join('')
-        : '<div class="col-12"><div class="alert alert-light border">No games found for these filters.</div></div>';
+    $('games-list').innerHTML = recentGames.length
+        ? recentGames.map(gameCard).join('')
+        : '<div class="col-12"><div class="alert alert-light border">No recently added games found for these filters.</div></div>';
 }
 
-function updateDashboardStats(games) {
-    const availableGames = games.filter(
-        (game) => game.status === 'OPEN' && game.available_slots > 0
-    ).length;
+async function loadJoinedGames() {
+    const games = await apiFetch('/game/');
+    const joinedGames = games.filter((game) => game.is_joined);
 
-    const joinedGames = games.filter((game) => game.is_joined).length;
-    const createdGames = games.filter((game) => game.is_creator).length;
+    $('joined-games-list').innerHTML = joinedGames.length
+        ? joinedGames.map(gameCard).join('')
+        : '<div class="col-12"><div class="dashboard-empty-state">No games joined yet.</div></div>';
+}
 
-    $('stat-available-games').textContent = availableGames;
-    $('stat-joined-games').textContent = joinedGames;
-    $('stat-created-games').textContent = createdGames;
+async function refreshGameViews() {
+    await Promise.all([
+        loadGames(),
+        loadJoinedGames()
+    ]);
 }
 
 function scrollToCreateGame() {
@@ -327,7 +332,7 @@ async function joinGame(id) {
             body: JSON.stringify({})
         });
         showAlert('You joined the game successfully.', 'success');
-        await loadGames();
+        await refreshGameViews();
     } catch (error) {
         showAlert(error.message, 'danger');
     }
@@ -342,7 +347,7 @@ async function leaveGame(id) {
             body: JSON.stringify({})
         });
         showAlert('You left the game successfully.', 'success');
-        await loadGames();
+        await refreshGameViews();
     } catch (error) {
         showAlert(error.message, 'danger');
     }
@@ -419,7 +424,7 @@ async function saveGameEdit(event) {
 
         bootstrap.Modal.getOrCreateInstance($('edit-game-modal')).hide();
         showAlert('Game updated successfully.', 'success');
-        await loadGames();
+        await refreshGameViews();
     } catch (error) {
         showAlert(error.message, 'danger');
     }
@@ -434,7 +439,7 @@ async function cancelGame(id) {
             body: JSON.stringify({})
         });
         showAlert('Game cancelled successfully.', 'success');
-        await loadGames();
+        await refreshGameViews();
     } catch (error) {
         showAlert(error.message, 'danger');
     }
@@ -448,7 +453,7 @@ async function deleteGame(id) {
             method: 'DELETE'
         });
         showAlert('Game deleted successfully.', 'success');
-        await loadGames();
+        await refreshGameViews();
     } catch (error) {
         showAlert(error.message, 'danger');
     }
@@ -483,8 +488,6 @@ async function createGame(event) {
         showAlert('Game created successfully.', 'success');
         $('game-form').reset();
         $('custom-sport-wrap').classList.add('d-none');
-        await loadGames();
-        $('create-game-card')?.scrollIntoView({behavior: 'smooth', block: 'start'});
     } catch (error) {
         showCreateGameError(error.message);
         showAlert(error.message, 'danger');
@@ -509,7 +512,10 @@ async function logout() {
     clearTokens();
     $('auth-section').classList.remove('d-none');
     $('app-section').classList.add('d-none');
+    $('dashboard-section').classList.add('d-none');
+    $('create-section').classList.add('d-none');
     $('logout-btn').classList.add('d-none');
+    $('menu-btn').classList.add('d-none');
     $('app-nav-menu').classList.add('d-none');
     $('user-name').textContent = '';
 }
@@ -539,29 +545,52 @@ function showLoginPanel() {
 
 
 
-function scrollToSection(id) {
-    $(id)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-    });
+function closePlayLinkMenu() {
+    const menu = $('playlink-menu');
+    if (menu) {
+        bootstrap.Offcanvas.getOrCreateInstance(menu).hide();
+    }
+}
+
+function showHome() {
+    $('app-section').classList.remove('d-none');
+    $('dashboard-section').classList.add('d-none');
+    $('create-section').classList.add('d-none');
+    loadGames().catch((error) => showAlert(error.message, 'danger'));
+    closePlayLinkMenu();
+}
+
+async function showDashboard() {
+    $('app-section').classList.add('d-none');
+    $('dashboard-section').classList.remove('d-none');
+    $('create-section').classList.add('d-none');
+
+    try {
+        await loadJoinedGames();
+    } catch (error) {
+        showAlert(error.message, 'danger');
+    }
+
+    closePlayLinkMenu();
+}
+
+function showCreateGamePage() {
+    $('app-section').classList.add('d-none');
+    $('dashboard-section').classList.add('d-none');
+    $('create-section').classList.remove('d-none');
+    clearCreateGameError();
+    setTimeout(() => $('game-title')?.focus(), 100);
+    closePlayLinkMenu();
 }
 
 $('navbar-home-link').addEventListener('click', (event) => {
     event.preventDefault();
-    scrollToSection('app-section');
+    showHome();
 });
 
-$('nav-home-btn').addEventListener('click', () => {
-    scrollToSection('app-section');
-});
-
-$('nav-status-btn').addEventListener('click', () => {
-    scrollToSection('games-section-header');
-});
-
-$('nav-create-btn').addEventListener('click', () => {
-    scrollToCreateGame();
-});
+$('nav-home-btn').addEventListener('click', showHome);
+$('nav-dashboard-btn').addEventListener('click', showDashboard);
+$('nav-create-btn').addEventListener('click', showCreateGamePage);
 
 $('show-register-btn').addEventListener('click', showRegisterPanel);
 $('show-login-btn').addEventListener('click', showLoginPanel);
@@ -605,7 +634,7 @@ $('edit-game-date').min = today;
 $('game-form').addEventListener('input', clearCreateGameError);
 $('edit-game-form').addEventListener('submit', saveGameEdit);
 $('refresh-btn').addEventListener('click', loadGames);
-$('create-game-shortcut')?.addEventListener('click', scrollToCreateGame);
+$('dashboard-refresh-btn').addEventListener('click', loadJoinedGames);
 $('filter-sport').addEventListener('change', loadGames);
 $('filter-date').addEventListener('change', loadGames);
 $('filter-status').addEventListener('change', loadGames);
