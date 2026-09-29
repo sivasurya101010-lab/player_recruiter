@@ -627,14 +627,143 @@ body {
     overflow: hidden;
 }
 
-.create-game-header {
+.create-game-intro {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 18px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #edf1f4;
+}
+
+.create-game-step {
+    display: inline-block;
+    margin-bottom: 7px;
+    color: #0879c9;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.9px;
+}
+
+.create-game-intro h3 {
+    margin: 0;
+    color: #17212b;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.create-game-intro p {
+    margin: 5px 0 0;
+    color: #68757e;
+    font-size: 14px;
+}
+
+.create-game-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
+    border-radius: 16px;
+    background: #eef7fb;
+    font-size: 26px;
+}
+
+.create-form-section {
+    padding: 4px 0 24px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #edf1f4;
+}
+
+.create-form-section-last {
+    margin-bottom: 0;
+    border-bottom: 0;
+}
+
+.create-form-section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.create-form-section-heading strong {
+    color: #26343d;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.create-form-section-heading span {
+    color: #8a9aa5;
+    font-size: 12px;
+}
+
+.create-game-form .form-label {
+    margin-bottom: 6px;
+    color: #33434d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.create-game-form .form-control,
+.create-game-form .form-select,
+.create-game-form .input-group-text {
+    min-height: 43px;
+    border-color: #dce5ea;
+    border-radius: 9px;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.create-game-form .form-control:focus,
+.create-game-form .form-select:focus {
+    border-color: #0879c9;
+    box-shadow: 0 0 0 3px rgba(8, 121, 201, 0.08);
+}
+
+.create-game-form textarea.form-control {
+    min-height: 105px;
+    resize: vertical;
+}
+
+.create-game-form .input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.create-game-form .input-group-text {
+    color: #68757e;
+    background: #f8fafb;
+    border-left: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.create-field-help {
+    margin-top: 6px;
+    color: #8a9aa5;
+    font-size: 11px;
+}
+
+.create-game-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 6px;
+}
+
+.create-game-actions .btn {
+    min-height: 42px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
 }
 
 #create-game-btn {
-    min-width: 140px;
+    min-width: 150px;
 }
 
 #create-game-btn:disabled {
@@ -652,11 +781,38 @@ body {
         padding: 20px !important;
     }
 
+    .create-game-intro {
+        align-items: flex-start;
+    }
+
+    .create-game-icon {
+        width: 46px;
+        height: 46px;
+        flex-basis: 46px;
+        border-radius: 13px;
+        font-size: 21px;
+    }
+
+    .create-game-intro h3 {
+        font-size: 21px;
+    }
+
+    .create-form-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .create-game-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .create-game-actions .btn,
     #create-game-btn {
         width: 100%;
     }
 }
-
 
 /* Phase 2 - Game cards */
 .game-card {
