@@ -39,5 +39,21 @@ class UserSerializer(serializers.ModelSerializer):
 
         return user
             
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'profile_picture',
+            'bio',
+            'location',
+        ]
+        read_only_fields = ['id', 'username']
+
+
 class LogoutSerializer(TokenBlacklistSerializer):
     pass
