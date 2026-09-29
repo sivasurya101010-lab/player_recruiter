@@ -204,34 +204,49 @@ async function restoreSession() {
     }
 
     try {
-        // Refresh the access token first on every page reload. This avoids
-        // depending on an old access token surviving the browser refresh.
-        if (state.refresh) {
-            const refreshResponse = await fetch(API + '/auth/refresh/', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({refresh: state.refresh})
-            });
-
-            if (!refreshResponse.ok) {
-                throw new Error('Saved login session could not be restored.');
-            }
-
-            const data = await refreshResponse.json();
-
-            if (!data.access) {
-                throw new Error('Saved login session could not be restored.');
-            }
-
-            state.access = data.access;
-            localStorage.setItem('playerRecruiterAccess', data.access);
-
-            if (data.refresh) {
-                state.refresh = data.refresh;
-                localStorage.setItem('playerRecruiterRefresh', data.refresh);
+        // First try the existing access token. This is important because a
+        // normal page refresh must not depend on refreshing a still-valid
+        // access token.
+        if (state.access) {
+            try {
+                await loadApp();
+                return;
+            } catch (error) {
+                // If the access token has expired, continue below and use the
+                // refresh token to get a new access token.
             }
         }
 
+        if (!state.refresh) {
+            throw new Error('Saved login session could not be restored.');
+        }
+
+        const refreshResponse = await fetch(API + '/auth/refresh/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({refresh: state.refresh})
+        });
+
+        if (!refreshResponse.ok) {
+            throw new Error('Saved login session could not be restored.');
+        }
+
+        const data = await refreshResponse.json();
+
+        if (!data.access) {
+            throw new Error('Saved login session could not be restored.');
+        }
+
+        state.access = data.access;
+        localStorage.setItem('playerRecruiterAccess', data.access);
+
+        if (data.refresh) {
+            state.refresh = data.refresh;
+            localStorage.setItem('playerRecruiterRefresh', data.refresh);
+        }
+
+        // The new access token is now used to restore the user and load the
+        // home page, including recently added games.
         await loadApp();
     } catch (error) {
         clearTokens();
