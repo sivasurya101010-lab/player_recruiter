@@ -53,46 +53,46 @@ class GameJoinView(generics.GenericAPIView):
 
     def post(self, request, pk):
 
-        try:
-            game = Game.objects.get(pk=pk)
+        with transaction.atomic():
+            try:
+                game = Game.objects.select_for_update().get(pk=pk)
 
-        except Game.DoesNotExist:
-            return Response(
-                {'detail': 'game not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            except Game.DoesNotExist:
+                return Response(
+                    {'detail': 'game not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-        if game.status != Game.Status.OPEN:
-            return Response(
-                {'detail': 'Game is not available'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            if game.status != Game.Status.OPEN:
+                return Response(
+                    {'detail': 'Game is not available'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        if game.participation.filter(user=request.user).exists():
-            return Response(
-                {'detail': 'Player already joined this game.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            if game.participation.filter(user=request.user).exists():
+                return Response(
+                    {'detail': 'Player already joined this game.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        if game.participation.count() >= game.players_needed:
-            game.status = Game.Status.FULL
-            game.save(update_fields=['status', 'updated_at'])
-            return Response(
-                {'detail': 'Player slots are full'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            if game.participation.count() >= game.players_needed:
+                game.status = Game.Status.FULL
+                game.save(update_fields=['status', 'updated_at'])
+                return Response(
+                    {'detail': 'Player slots are full'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        GamePlayer.objects.create(game=game, user=request.user)
+            GamePlayer.objects.create(game=game, user=request.user)
 
-        if game.participation.count() >= game.players_needed:
-            game.status = Game.Status.FULL
-            game.save(update_fields=['status', 'updated_at'])
+            if game.participation.count() >= game.players_needed:
+                game.status = Game.Status.FULL
+                game.save(update_fields=['status', 'updated_at'])
 
         return Response(
             {'message': 'Successfully joined the game.'},
             status=status.HTTP_201_CREATED
         )
-
 
 class GameLeaveView(generics.GenericAPIView):
 
