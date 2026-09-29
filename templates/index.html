@@ -55,7 +55,7 @@
                                 <input id="login-show-password" type="checkbox">
                                 <span>Show password</span>
                             </label>
-                            <button type="button" class="forgot-button">Forgot password?</button>
+                            <button type="button" id="forgot-password-btn" class="forgot-button">Forgot password?</button>
                         </div>
 
                         <button class="btn auth-login-button w-100">
@@ -67,7 +67,7 @@
                         <span>OR</span>
                     </div>
 
-                    <button type="button" class="google-button w-100">
+                    <button type="button" id="google-login-btn" class="google-button w-100">
                         <span class="google-icon">G</span>
                         Continue with Google
                     </button>
@@ -206,14 +206,21 @@
 
         <div id="games-list" class="row g-4 mb-5"></div>
 
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h3>Create a game</h3>
-                <form id="game-form">
+        <div id="create-game-card" class="card shadow-sm create-game-card">
+            <div class="card-body p-4 p-lg-5">
+                <div class="create-game-header">
+                    <div>
+                        <p class="dashboard-eyebrow mb-1">HOST A GAME</p>
+                        <h3 class="mb-1">Create a game</h3>
+                        <p class="text-muted mb-0">Tell other players when and where you are playing.</p>
+                    </div>
+                </div>
+                <div id="create-game-errors" class="alert alert-danger d-none mt-4 mb-0" role="alert"></div>
+                <form id="game-form" class="mt-4">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Title</label>
-                            <input id="game-title" class="form-control" placeholder="Sunday Football" required>
+                            <input id="game-title" class="form-control" placeholder="Sunday Football" maxlength="150" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Sport</label>
@@ -221,7 +228,7 @@
                         </div>
                         <div id="custom-sport-wrap" class="col-md-6 d-none">
                             <label class="form-label">Custom sport</label>
-                            <input id="custom-sport" class="form-control" placeholder="Volleyball">
+                            <input id="custom-sport" class="form-control" placeholder="Volleyball" maxlength="100">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Date</label>
@@ -241,14 +248,14 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label">Location</label>
-                            <input id="game-location" class="form-control" placeholder="Ground / stadium" required>
+                            <input id="game-location" class="form-control" placeholder="Ground / stadium" maxlength="500" required>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Description</label>
-                            <textarea id="game-description" class="form-control" rows="3" placeholder="Casual game..."></textarea>
+                            <textarea id="game-description" class="form-control" rows="3" placeholder="Casual game..." maxlength="1000"></textarea>
                         </div>
                     </div>
-                    <button class="btn btn-primary mt-3">Create game</button>
+                    <button id="create-game-btn" class="btn btn-primary mt-3">Create game</button>
                 </form>
             </div>
         </div>
