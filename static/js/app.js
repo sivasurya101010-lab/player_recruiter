@@ -4,7 +4,10 @@ const state = {
     access: localStorage.getItem('playerRecruiterAccess'),
     refresh: localStorage.getItem('playerRecruiterRefresh'),
     user: null,
-    sports: []
+    sports: [],
+    exploreSport: '',
+    exploreGames: [],
+    showAllExploreGames: false
 };
 
 const $ = (id) => document.getElementById(id);
@@ -363,6 +366,139 @@ function gameCard(game) {
     `;
 }
 
+function renderExploreSportTabs() {
+    const tabs = $('explore-sport-tabs');
+    if (!tabs) return;
+
+    const allTabs = [
+        {id: '', name: 'All games'},
+        ...state.sports.map((sport) => ({id: String(sport.id), name: sport.name}))
+    ];
+
+    tabs.innerHTML = allTabs.map((sport) => `
+        <button
+            type="button"
+            class="explore-sport-tab ${state.exploreSport === sport.id ? 'active' : ''}"
+            data-sport-id="${escapeHtml(sport.id)}"
+            role="tab"
+            aria-selected="${state.exploreSport === sport.id}"
+        >
+            ${escapeHtml(sport.name)}
+        </button>
+    `).join('');
+
+    tabs.querySelectorAll('.explore-sport-tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+            state.exploreSport = tab.dataset.sportId || '';
+            state.showAllExploreGames = false;
+            const filterSport = $('filter-sport');
+            if (filterSport) filterSport.value = state.exploreSport;
+            renderExploreGames(state.exploreGames || []);
+            renderExploreSportTabs();
+        });
+    });
+}
+
+function exploreGameCard(game) {
+    const sportName = game.sport_details?.name === 'Other' && game.custom_sport_name
+        ? game.custom_sport_name
+        : (game.sport_details?.name || 'Sport');
+
+    const statusClass = {
+        OPEN: 'badge-open',
+        FULL: 'badge-full',
+        CANCELLED: 'badge-cancelled',
+        COMPLETED: 'badge-completed'
+    }[game.status] || 'badge-full';
+
+    const date = game.date || 'Date not set';
+    const time = game.start_time ? game.start_time.slice(0, 5) : 'Time not set';
+    const playerText = `${game.current_players}/${game.players_needed} players`;
+
+    let primaryAction = '';
+    if (game.is_creator) {
+        primaryAction = `
+            <button class="btn btn-outline-primary btn-sm" onclick="editGame(${game.id})">
+                Manage
+            </button>
+        `;
+    } else if (game.is_joined) {
+        primaryAction = `
+            <button class="btn btn-outline-danger btn-sm" onclick="leaveGame(${game.id})">
+                Leave
+            </button>
+        `;
+    } else {
+        const canJoin = game.status === 'OPEN' && game.available_slots > 0;
+        primaryAction = `
+            <button class="btn btn-primary btn-sm" onclick="joinGame(${game.id})" ${canJoin ? '' : 'disabled'}>
+                ${canJoin ? 'Join game' : 'Not available'}
+            </button>
+        `;
+    }
+
+    return `
+        <article class="explore-game-card">
+            <div class="explore-game-visual">
+                <span class="explore-game-sport-label">${escapeHtml(sportName)}</span>
+                <span class="explore-game-status ${statusClass}">${escapeHtml(game.status)}</span>
+            </div>
+            <div class="explore-game-body">
+                <h3 class="explore-game-title" title="${escapeHtml(game.title)}">
+                    ${escapeHtml(game.title)}
+                </h3>
+                <p class="explore-game-location" title="${escapeHtml(game.location)}">
+                    ${escapeHtml(game.location)}
+                </p>
+                <div class="explore-game-meta">
+                    <span><strong>${escapeHtml(date)}</strong></span>
+                    <span>${escapeHtml(time)}</span>
+                    <span>${escapeHtml(playerText)}</span>
+                </div>
+                <p class="explore-game-description">
+                    ${escapeHtml(game.description || 'No description provided.')}
+                </p>
+                <div class="explore-game-actions">
+                    ${primaryAction}
+                    <button
+                        class="explore-game-arrow"
+                        type="button"
+                        onclick="showPlayers(${game.id})"
+                        aria-label="View players for ${escapeHtml(game.title)}"
+                        title="View players"
+                    >
+                        →
+                    </button>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function renderExploreGames(games) {
+    const list = $('games-list');
+    const moreButton = $('see-more-games-btn');
+    if (!list) return;
+
+    const filteredGames = state.exploreSport
+        ? games.filter((game) => String(game.sport) === String(state.exploreSport))
+        : games;
+    const visibleGames = state.showAllExploreGames
+        ? filteredGames
+        : filteredGames.slice(0, 6);
+
+    list.innerHTML = visibleGames.length
+        ? visibleGames.map(exploreGameCard).join('')
+        : '<div class="explore-games-empty">No games found for this sport and filter.</div>';
+
+    if (moreButton) {
+        const canShowMore = filteredGames.length > 6;
+        moreButton.classList.toggle('d-none', !canShowMore);
+        moreButton.innerHTML = state.showAllExploreGames
+            ? 'Show fewer games <span aria-hidden="true">↑</span>'
+            : 'See more games <span aria-hidden="true">→</span>';
+    }
+}
 async function loadGames() {
     const params = new URLSearchParams();
 
@@ -370,18 +506,16 @@ async function loadGames() {
     if ($('filter-date').value) params.set('date', $('filter-date').value);
     if ($('filter-status').value) params.set('status', $('filter-status').value);
 
-    const hasFilters = params.toString().length > 0;
     const query = params.toString();
     const gamesResponse = await apiFetch('/game/' + (query ? '?' + query : ''));
     const games = Array.isArray(gamesResponse) ? gamesResponse : (gamesResponse.results || []);
 
-    // The API returns newest games first. With no filters, show the newest
-    // games created anywhere in PlayLink. Filters change the result set.
-    const recentGames = hasFilters ? games : games.slice(0, 6);
+    state.exploreGames = games;
+    state.showAllExploreGames = false;
+    state.exploreSport = $('filter-sport').value || '';
 
-    $('games-list').innerHTML = recentGames.length
-        ? recentGames.map(gameCard).join('')
-        : '<div class="col-12"><div class="alert alert-light border">No recently added games found for these filters.</div></div>';
+    renderExploreSportTabs();
+    renderExploreGames(games);
 }
 
 async function loadJoinedGames() {
@@ -739,6 +873,11 @@ $('edit-game-date').min = today;
 $('game-form').addEventListener('input', clearCreateGameError);
 $('edit-game-form').addEventListener('submit', saveGameEdit);
 $('filter-sport').addEventListener('change', loadGames);
+
+$('see-more-games-btn')?.addEventListener('click', () => {
+    state.showAllExploreGames = !state.showAllExploreGames;
+    renderExploreGames(state.exploreGames || []);
+};
 $('filter-date').addEventListener('change', loadGames);
 $('filter-status').addEventListener('change', loadGames);
 
