@@ -220,3 +220,64 @@ def test_logout_blacklists_refresh_token(api_client, user):
     )
 
     assert refresh_response.status_code == 401
+
+
+@pytest.mark.django_db
+def test_authenticated_user_can_update_profile(api_client, user):
+    api_client.force_authenticate(user=user)
+
+    response = api_client.patch(
+        '/api/auth/me/',
+        {
+            'first_name': 'Test',
+            'last_name': 'Player',
+            'email': 'updated@example.com',
+            'location': 'Palakkad',
+            'bio': 'Football player',
+        },
+        format='json',
+    )
+
+    assert response.status_code == 200
+    assert response.data['first_name'] == 'Test'
+    assert response.data['last_name'] == 'Player'
+    assert response.data['email'] == 'updated@example.com'
+    assert response.data['location'] == 'Palakkad'
+    assert response.data['bio'] == 'Football player'
+
+    user.refresh_from_db()
+    assert user.first_name == 'Test'
+    assert user.last_name == 'Player'
+    assert user.email == 'updated@example.com'
+    assert user.location == 'Palakkad'
+    assert user.bio == 'Football player'
+
+
+@pytest.mark.django_db
+def test_user_cannot_update_profile_with_existing_email(api_client, user):
+    other_user = User.objects.create_user(
+        username='otheruser',
+        email='other@example.com',
+        password='TestPassword123',
+    )
+    api_client.force_authenticate(user=user)
+
+    response = api_client.patch(
+        '/api/auth/me/',
+        {'email': other_user.email},
+        format='json',
+    )
+
+    assert response.status_code == 400
+    assert 'email' in response.data
+
+
+@pytest.mark.django_db
+def test_unauthenticated_user_cannot_update_profile(api_client):
+    response = api_client.patch(
+        '/api/auth/me/',
+        {'first_name': 'Blocked'},
+        format='json',
+    )
+
+    assert response.status_code == 401
