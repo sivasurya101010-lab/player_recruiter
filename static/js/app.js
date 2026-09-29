@@ -177,9 +177,9 @@ async function register() {
 }
 
 async function loadApp() {
-    // First verify/restore the saved login session.
     state.user = await apiFetch('/auth/me/');
 
+    $('session-loading').classList.add('d-none');
     $('auth-section').classList.add('d-none');
     $('app-section').classList.remove('d-none');
     $('dashboard-section').classList.add('d-none');
@@ -189,75 +189,81 @@ async function loadApp() {
     $('user-name').textContent = state.user.username;
     $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
 
-    // Data-loading errors must not log the user out.
-    // Load Home data independently. A problem loading the sport filter
-    // must not prevent recently added games from appearing.
-    try {
-        await loadSports();
-    } catch (error) {
-        showAlert(error.message || 'Could not load sports.', 'danger');
+    const results = await Promise.allSettled([
+        loadSports(),
+        loadGames()
+    ]);
+
+    if (results[0].status === 'rejected') {
+        showAlert(results[0].reason?.message || 'Could not load sports.', 'danger');
     }
 
-    try {
-        await loadGames();
-    } catch (error) {
-        showAlert(error.message || 'Could not load recently added games.', 'danger');
+    if (results[1].status === 'rejected') {
+        showAlert(results[1].reason?.message || 'Could not load recently added games.', 'danger');
     }
 }
 
 async function restoreSession() {
     if (!state.access && !state.refresh) {
+        showLoginPanel();
         return;
     }
 
+    $('session-loading').classList.remove('d-none');
+    $('auth-section').classList.add('d-none');
+
     try {
-        // First try the existing access token. This is important because a
-        // normal page refresh must not depend on refreshing a still-valid
-        // access token.
-        if (state.access) {
-            try {
-                await loadApp();
-                return;
-            } catch (error) {
-                // If the access token has expired, continue below and use the
-                // refresh token to get a new access token.
-            }
-        }
-
-        if (!state.refresh) {
-            throw new Error('Saved login session could not be restored.');
-        }
-
-        const refreshResponse = await fetch(API + '/auth/refresh/', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({refresh: state.refresh})
-        });
-
-        if (!refreshResponse.ok) {
-            throw new Error('Saved login session could not be restored.');
-        }
-
-        const data = await refreshResponse.json();
-
-        if (!data.access) {
-            throw new Error('Saved login session could not be restored.');
-        }
-
-        state.access = data.access;
-        localStorage.setItem('playerRecruiterAccess', data.access);
-
-        if (data.refresh) {
-            state.refresh = data.refresh;
-            localStorage.setItem('playerRecruiterRefresh', data.refresh);
-        }
-
-        // The new access token is now used to restore the user and load the
-        // home page, including recently added games.
+        // apiFetch refreshes an expired access token once before failing.
         await loadApp();
     } catch (error) {
-        clearTokens();
-        showLoginPanel();
+        if (!state.refresh) {
+            clearTokens();
+            showLoginPanel();
+            showAlert('Your saved login session has expired. Please log in again.', 'danger');
+            return;
+        }
+
+        try {
+            const refreshResponse = await fetch(API + '/auth/refresh/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({refresh: state.refresh})
+            });
+
+            if (!refreshResponse.ok) {
+                clearTokens();
+                showLoginPanel();
+                showAlert('Your saved login session has expired. Please log in again.', 'danger');
+                return;
+            }
+
+            const data = await refreshResponse.json();
+
+            if (!data.access) {
+                throw new Error('Refresh response did not contain an access token.');
+            }
+
+            state.access = data.access;
+            localStorage.setItem('playerRecruiterAccess', data.access);
+
+            if (data.refresh) {
+                state.refresh = data.refresh;
+                localStorage.setItem('playerRecruiterRefresh', data.refresh);
+            }
+
+            await loadApp();
+        } catch (refreshError) {
+            // Do not destroy tokens on a transient network/server error.
+            if (refreshError instanceof TypeError) {
+                $('session-loading').classList.add('d-none');
+                showAlert('Could not restore your session. Check your connection and refresh again.', 'danger');
+                return;
+            }
+
+            clearTokens();
+            showLoginPanel();
+            showAlert('Your saved login session has expired. Please log in again.', 'danger');
+        }
     }
 }
 
@@ -357,7 +363,8 @@ async function loadGames() {
 
     const hasFilters = params.toString().length > 0;
     const query = params.toString();
-    const games = await apiFetch('/game/' + (query ? '?' + query : ''));
+    const gamesResponse = await apiFetch('/game/' + (query ? '?' + query : ''));
+    const games = Array.isArray(gamesResponse) ? gamesResponse : (gamesResponse.results || []);
 
     // The API returns newest games first. With no filters, show the newest
     // games created anywhere in PlayLink. Filters change the result set.
@@ -369,7 +376,8 @@ async function loadGames() {
 }
 
 async function loadJoinedGames() {
-    const games = await apiFetch('/game/');
+    const gamesResponse = await apiFetch('/game/');
+    const games = Array.isArray(gamesResponse) ? gamesResponse : (gamesResponse.results || []);
     const joinedGames = games.filter((game) => game.is_joined);
 
     $('joined-games-list').innerHTML = joinedGames.length
@@ -618,6 +626,13 @@ function showRegisterPanel() {
 }
 
 function showLoginPanel() {
+    $('session-loading').classList.add('d-none');
+    $('auth-section').classList.remove('d-none');
+    $('app-section').classList.add('d-none');
+    $('dashboard-section').classList.add('d-none');
+    $('create-section').classList.add('d-none');
+    $('menu-btn').classList.add('d-none');
+    $('app-nav-menu').classList.add('d-none');
     $('register-panel').classList.add('d-none');
     $('login-panel').classList.remove('d-none');
     $('alert-box').innerHTML = '';
