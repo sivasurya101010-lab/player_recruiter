@@ -221,9 +221,41 @@
         <div class="dashboard-header mb-4">
             <div>
                 <p class="dashboard-eyebrow mb-1">PLAYER DASHBOARD</p>
-                <h1 class="dashboard-title mb-1">PlayLink Dashboard</h1>
-                <p class="text-muted mb-0">Games you have joined.</p>
+                <h1 class="dashboard-title mb-1">My games</h1>
+                <p class="text-muted mb-0">Keep track of the games you joined and host.</p>
             </div>
+            <button type="button" class="btn btn-primary" onclick="showCreateGamePage()">
+                Create a game
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4 dashboard-stats">
+            <div class="col-12 col-md-4">
+                <div class="dashboard-stat-card">
+                    <div class="dashboard-stat-label">Joined games</div>
+                    <div id="dashboard-joined-count" class="dashboard-stat-value">0</div>
+                    <div class="dashboard-stat-help">Games you are part of</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="dashboard-stat-card">
+                    <div class="dashboard-stat-label">Upcoming</div>
+                    <div id="dashboard-upcoming-count" class="dashboard-stat-value">0</div>
+                    <div class="dashboard-stat-help">Joined games still ahead</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="dashboard-stat-card">
+                    <div class="dashboard-stat-label">Hosted</div>
+                    <div id="dashboard-hosted-count" class="dashboard-stat-value">0</div>
+                    <div class="dashboard-stat-help">Games you created</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-games-heading">
+            <h2>My joined games</h2>
+            <span>Tap a game to view its details.</span>
         </div>
 
         <div id="joined-games-list" class="row g-4"></div>
