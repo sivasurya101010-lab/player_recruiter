@@ -1,6 +1,7 @@
 import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 User = get_user_model()
@@ -34,6 +35,71 @@ def test_user_can_register(api_client):
 
     assert response.status_code == 201
     assert User.objects.filter(username='newuser').exists()
+
+
+@pytest.mark.django_db
+def test_registered_password_is_hashed(api_client):
+    api_client.post(
+        '/api/auth/register/',
+        {
+            'username': 'hashuser',
+            'email': 'hashuser@example.com',
+            'password': 'TestPassword123',
+        },
+        format='json',
+    )
+
+    user = User.objects.get(username='hashuser')
+    assert user.password != 'TestPassword123'
+    assert user.check_password('TestPassword123')
+
+
+@pytest.mark.django_db
+def test_duplicate_email_registration_is_rejected(api_client, user):
+    response = api_client.post(
+        '/api/auth/register/',
+        {
+            'username': 'anotheruser',
+            'email': 'testuser@example.com',
+            'password': 'TestPassword123',
+        },
+        format='json',
+    )
+
+    assert response.status_code == 400
+    assert 'email' in response.data
+
+
+@pytest.mark.django_db
+def test_duplicate_username_registration_is_rejected(api_client, user):
+    response = api_client.post(
+        '/api/auth/register/',
+        {
+            'username': 'testuser',
+            'email': 'another@example.com',
+            'password': 'TestPassword123',
+        },
+        format='json',
+    )
+
+    assert response.status_code == 400
+    assert 'username' in response.data
+
+
+@pytest.mark.django_db
+def test_weak_password_registration_is_rejected(api_client):
+    response = api_client.post(
+        '/api/auth/register/',
+        {
+            'username': 'weakuser',
+            'email': 'weak@example.com',
+            'password': '123',
+        },
+        format='json',
+    )
+
+    assert response.status_code == 400
+    assert 'password' in response.data
 
 
 @pytest.mark.django_db
@@ -100,3 +166,57 @@ def test_unauthenticated_user_cannot_view_profile(api_client):
     response = api_client.get('/api/auth/me/')
 
     assert response.status_code == 401
+
+
+@pytest.mark.django_db
+def test_refresh_token_can_restore_session(api_client, user):
+    login_response = api_client.post(
+        '/api/auth/login/',
+        {
+            'username': 'testuser',
+            'password': 'TestPassword123',
+        },
+        format='json',
+    )
+
+    response = api_client.post(
+        '/api/auth/refresh/',
+        {'refresh': login_response.data['refresh']},
+        format='json',
+    )
+
+    assert response.status_code == 200
+    assert 'access' in response.data
+
+
+@pytest.mark.django_db
+def test_invalid_refresh_token_is_rejected(api_client):
+    response = api_client.post(
+        '/api/auth/refresh/',
+        {'refresh': 'invalid-token'},
+        format='json',
+    )
+
+    assert response.status_code == 401
+
+
+@pytest.mark.django_db
+def test_logout_blacklists_refresh_token(api_client, user):
+    refresh = RefreshToken.for_user(user)
+    api_client.force_authenticate(user=user)
+
+    response = api_client.post(
+        '/api/auth/logout/',
+        {'refresh': str(refresh)},
+        format='json',
+    )
+
+    assert response.status_code == 200
+
+    refresh_response = api_client.post(
+        '/api/auth/refresh/',
+        {'refresh': str(refresh)},
+        format='json',
+    )
+
+    assert refresh_response.status_code == 401
