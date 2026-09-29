@@ -295,18 +295,74 @@
 </main>
 
 <div class="modal fade" id="game-details-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content game-details-modal">
             <div class="modal-header">
-                <div>
-                    <p id="game-details-sport" class="game-details-modal-sport mb-1">Sport</p>
+                <div class="game-details-modal-heading">
+                    <div class="game-details-modal-title-row">
+                        <p id="game-details-sport" class="game-details-modal-sport mb-0">Sport</p>
+                        <span id="game-details-status" class="game-details-modal-status">OPEN</span>
+                    </div>
                     <h5 id="game-details-title" class="modal-title">Game details</h5>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
-                <p id="game-details-description" class="game-details-modal-description"></p>
-                <div id="game-details-list" class="game-details-modal-list"></div>
+                <div class="game-details-quick-info">
+                    <div class="game-details-quick-item">
+                        <span class="game-details-quick-icon">📍</span>
+                        <div>
+                            <span class="game-details-quick-label">Ground / place</span>
+                            <strong id="game-details-location">Not set</strong>
+                        </div>
+                    </div>
+                    <div class="game-details-quick-item">
+                        <span class="game-details-quick-icon">📅</span>
+                        <div>
+                            <span class="game-details-quick-label">Date</span>
+                            <strong id="game-details-date">Not set</strong>
+                        </div>
+                    </div>
+                    <div class="game-details-quick-item">
+                        <span class="game-details-quick-icon">🕒</span>
+                        <div>
+                            <span class="game-details-quick-label">Time</span>
+                            <strong id="game-details-time">Not set</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-details-section">
+                    <h6>About this game</h6>
+                    <p id="game-details-description" class="game-details-modal-description"></p>
+                </div>
+
+                <div class="game-details-section">
+                    <h6>Game information</h6>
+                    <div id="game-details-list" class="game-details-modal-list"></div>
+                </div>
+
+                <div class="game-details-section game-details-creator-section">
+                    <h6>Created by</h6>
+                    <div class="game-details-creator">
+                        <div id="game-details-creator-avatar" class="game-details-creator-avatar">?</div>
+                        <div>
+                            <strong id="game-details-creator-name">Unknown player</strong>
+                            <span id="game-details-creator-username">Creator</span>
+                        </div>
+                    </div>
+                    <div class="game-details-created-at">
+                        Created <span id="game-details-created-at">Not available</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer game-details-modal-footer">
+                <button id="game-details-players-btn" type="button" class="btn btn-outline-secondary">
+                    View players
+                </button>
+                <div id="game-details-action"></div>
             </div>
         </div>
     </div>
