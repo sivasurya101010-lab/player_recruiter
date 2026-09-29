@@ -586,3 +586,41 @@ body {
         flex: 1;
     }
 }
+
+
+/* Phase 2 - Create game */
+.create-game-card {
+    border: 1px solid #e0e8ee;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.create-game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#create-game-btn {
+    min-width: 140px;
+}
+
+#create-game-btn:disabled {
+    cursor: wait;
+    opacity: 0.75;
+}
+
+#create-game-errors {
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+@media (max-width: 575px) {
+    .create-game-card .card-body {
+        padding: 20px !important;
+    }
+
+    #create-game-btn {
+        width: 100%;
+    }
+}
