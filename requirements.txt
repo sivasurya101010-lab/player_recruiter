@@ -1,4 +1,4 @@
-﻿asgiref==3.12.1
+asgiref==3.12.1
 Django==6.1
 djangorestframework==3.18.0
 djangorestframework_simplejwt==5.5.1
@@ -10,3 +10,4 @@ sqlparse==0.6.0
 tzdata==2026.3
 pytest==8.4.2
 pytest-django==4.11.1
+drf-spectacular==0.30.0
