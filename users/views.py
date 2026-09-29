@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from .models import User
-from .serializers import UserSerializer, LogoutSerializer
+from .serializers import UserSerializer, ProfileSerializer, LogoutSerializer
 
 
 class LoginView(TokenObtainPairView):
@@ -63,15 +63,15 @@ class RegisterView(generics.CreateAPIView):
         return super().post(request, *args, **kwargs)
 
 
-class MyProfileView(generics.RetrieveAPIView):
-    serializer_class = UserSerializer
+class MyProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        summary="Get my profile",
-        description="Return the profile of the currently authenticated user.",
+        summary="Get and update my profile",
+        description="Return or update the profile of the currently authenticated user.",
         responses={
-            200: UserSerializer,
+            200: ProfileSerializer,
             401: OpenApiResponse(description="Authentication credentials were not provided or are invalid."),
         },
         tags=["Authentication"],
