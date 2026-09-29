@@ -287,7 +287,7 @@ async function editGame(id) {
         $('edit-game-sport').value = game.sport;
         $('edit-custom-sport').value = game.custom_sport_name || '';
         $('edit-game-date').value = game.date;
-        $('edit-game-time').value = game.start_time;
+        $('edit-game-time').value = game.start_time.slice(0, 5);
         $('edit-game-duration').value = game.duration;
         $('edit-game-players').value = game.players_needed;
         $('edit-game-location').value = game.location;
