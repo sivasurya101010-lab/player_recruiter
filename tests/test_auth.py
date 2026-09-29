@@ -69,6 +69,22 @@ def test_login_with_wrong_password_is_rejected(api_client, user):
 
 
 @pytest.mark.django_db
+def test_login_with_nonexistent_username_is_rejected(api_client):
+    response = api_client.post(
+        '/api/auth/login/',
+        {
+            'username': 'doesnotexist',
+            'password': 'TestPassword123',
+        },
+        format='json',
+    )
+
+    assert response.status_code == 401
+    assert 'access' not in response.data
+    assert 'refresh' not in response.data
+
+
+@pytest.mark.django_db
 def test_authenticated_user_can_view_profile(api_client, user):
     api_client.force_authenticate(user=user)
 
