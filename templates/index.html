@@ -43,6 +43,7 @@
             <button class="menu-item" id="nav-home-btn" type="button">Home</button>
             <button class="menu-item" id="nav-dashboard-btn" type="button">PlayLink Dashboard</button>
             <button class="menu-item" id="nav-create-btn" type="button">Create game</button>
+            <button class="menu-item" id="nav-profile-btn" type="button">My profile</button>
             <button class="menu-item menu-item-logout" id="nav-logout-btn" type="button">Logout</button>
         </div>
     </div>
@@ -215,6 +216,81 @@
 
             <div id="games-list" class="explore-games-track"></div>
         </section>
+    </section>
+
+    <section id="profile-section" class="d-none">
+        <div class="dashboard-header mb-4">
+            <div>
+                <p class="dashboard-eyebrow mb-1">ACCOUNT</p>
+                <h1 class="dashboard-title mb-1">My profile</h1>
+                <p class="text-muted mb-0">Keep your PlayLink profile up to date so other players know who you are.</p>
+            </div>
+        </div>
+
+        <div class="profile-page-card">
+            <div class="profile-page-top">
+                <div id="profile-page-avatar" class="profile-page-avatar">?</div>
+                <div>
+                    <span class="profile-page-eyebrow">YOUR PROFILE</span>
+                    <h2 id="profile-page-name">Player</h2>
+                    <p id="profile-page-username">@player</p>
+                </div>
+            </div>
+
+            <div id="profile-form-message" class="alert d-none" role="alert"></div>
+
+            <form id="profile-form" class="profile-form">
+                <div class="profile-form-section">
+                    <div class="profile-form-heading">
+                        <strong>Personal details</strong>
+                        <span>Shown to other players.</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="profile-first-name">First name</label>
+                            <input id="profile-first-name" class="form-control" maxlength="150">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="profile-last-name">Last name</label>
+                            <input id="profile-last-name" class="form-control" maxlength="150">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="profile-email">Email</label>
+                            <input id="profile-email" type="email" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="profile-location">Location</label>
+                            <input id="profile-location" class="form-control" maxlength="100" placeholder="e.g. Palakkad">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="profile-bio">Bio</label>
+                            <textarea id="profile-bio" class="form-control" rows="4" maxlength="50" placeholder="Tell players a little about you."></textarea>
+                            <div class="profile-field-help">Maximum 50 characters.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-form-section profile-form-section-last">
+                    <div class="profile-form-heading">
+                        <strong>Profile picture</strong>
+                        <span>Optional.</span>
+                    </div>
+                    <div class="profile-picture-upload">
+                        <div id="profile-upload-avatar" class="profile-upload-avatar">?</div>
+                        <div class="profile-upload-controls">
+                            <label class="form-label" for="profile-picture">Choose a picture</label>
+                            <input id="profile-picture" type="file" class="form-control" accept="image/*">
+                            <div class="profile-field-help">Choose an image supported by your browser.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-form-actions">
+                    <button id="profile-cancel-btn" type="button" class="btn btn-light">Cancel</button>
+                    <button id="profile-save-btn" type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
     </section>
 
     <section id="dashboard-section" class="d-none">
