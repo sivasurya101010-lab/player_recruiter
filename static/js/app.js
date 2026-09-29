@@ -195,7 +195,6 @@ async function loadApp() {
     $('menu-btn').classList.remove('d-none');
     $('app-nav-menu').classList.remove('d-none');
     $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
-    $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
 
     if (results[0].status === 'rejected') {
         showAlert(results[0].reason?.message || 'Could not load sports.', 'danger');
