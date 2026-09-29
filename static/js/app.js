@@ -420,6 +420,21 @@ function toggleEditCustomSport() {
     );
 }
 
+function showRegisterPanel() {
+    $('login-panel').classList.add('d-none');
+    $('register-panel').classList.remove('d-none');
+    $('alert-box').innerHTML = '';
+}
+
+function showLoginPanel() {
+    $('register-panel').classList.add('d-none');
+    $('login-panel').classList.remove('d-none');
+    $('alert-box').innerHTML = '';
+}
+
+$('show-register-btn').addEventListener('click', showRegisterPanel);
+$('show-login-btn').addEventListener('click', showLoginPanel);
+
 $('login-form').addEventListener('submit', async (event) => {
     event.preventDefault();
 
