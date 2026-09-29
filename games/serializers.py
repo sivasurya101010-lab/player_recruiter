@@ -34,19 +34,19 @@ class GameSerializer(serializers.ModelSerializer):
             'updated_at'
         ]
 
-    def get_current_players(self, values):
+    def get_current_players(self, values) -> int:
         return values.participation.count()
 
-    def get_available_slots(self, values):
+    def get_available_slots(self, values) -> int:
         return max(0, values.players_needed - values.participation.count())
 
-    def get_is_joined(self, values):
+    def get_is_joined(self, values) -> bool:
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             return False
         return values.participation.filter(user=request.user).exists()
 
-    def get_is_creator(self, values):
+    def get_is_creator(self, values) -> bool:
         request = self.context.get('request')
         if not request or not request.user.is_authenticated:
             return False
