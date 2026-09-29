@@ -174,7 +174,6 @@ async function loadApp() {
     $('app-section').classList.remove('d-none');
     $('dashboard-section').classList.add('d-none');
     $('create-section').classList.add('d-none');
-    $('logout-btn').classList.remove('d-none');
     $('menu-btn').classList.remove('d-none');
     $('app-nav-menu').classList.remove('d-none');
     $('user-name').textContent = state.user.username;
@@ -278,10 +277,13 @@ async function loadGames() {
     if ($('filter-date').value) params.set('date', $('filter-date').value);
     if ($('filter-status').value) params.set('status', $('filter-status').value);
 
+    const hasFilters = params.toString().length > 0;
     const query = params.toString();
     const games = await apiFetch('/game/' + (query ? '?' + query : ''));
 
-    const recentGames = games.slice(0, 6);
+    // The API returns newest games first. With no filters, show the newest
+    // games created anywhere in PlayLink. Filters change the result set.
+    const recentGames = hasFilters ? games : games.slice(0, 6);
 
     $('games-list').innerHTML = recentGames.length
         ? recentGames.map(gameCard).join('')
@@ -514,7 +516,6 @@ async function logout() {
     $('app-section').classList.add('d-none');
     $('dashboard-section').classList.add('d-none');
     $('create-section').classList.add('d-none');
-    $('logout-btn').classList.add('d-none');
     $('menu-btn').classList.add('d-none');
     $('app-nav-menu').classList.add('d-none');
     $('user-name').textContent = '';
