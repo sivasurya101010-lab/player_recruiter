@@ -369,10 +369,20 @@
 </div>
 
 <div class="modal fade" id="players-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog"><div class="modal-content">
-        <div class="modal-header"><h5 id="players-modal-title" class="modal-title">Game players</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body"><div id="players-list"></div></div>
-    </div></div>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content players-modal">
+            <div class="modal-header">
+                <div>
+                    <h5 id="players-modal-title" class="modal-title">Game players</h5>
+                    <span id="players-modal-count" class="players-modal-count">0 players joined</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="players-list" class="players-modal-list"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="edit-game-modal" tabindex="-1" aria-hidden="true">
