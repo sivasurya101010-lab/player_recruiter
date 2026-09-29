@@ -592,6 +592,7 @@ $('navbar-home-link').addEventListener('click', (event) => {
 $('nav-home-btn').addEventListener('click', showHome);
 $('nav-dashboard-btn').addEventListener('click', showDashboard);
 $('nav-create-btn').addEventListener('click', showCreateGamePage);
+$('nav-logout-btn').addEventListener('click', logout);
 
 $('show-register-btn').addEventListener('click', showRegisterPanel);
 $('show-login-btn').addEventListener('click', showLoginPanel);
@@ -639,7 +640,7 @@ $('dashboard-refresh-btn').addEventListener('click', loadJoinedGames);
 $('filter-sport').addEventListener('change', loadGames);
 $('filter-date').addEventListener('change', loadGames);
 $('filter-status').addEventListener('change', loadGames);
-$('logout-btn').addEventListener('click', logout);
+
 
 $('google-login-btn')?.addEventListener('click', () => {
     showAlert('Google login is not available yet.', 'info');
