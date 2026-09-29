@@ -169,7 +169,9 @@ async function register() {
 }
 
 async function loadApp() {
+    // First verify/restore the saved login session.
     state.user = await apiFetch('/auth/me/');
+
     $('auth-section').classList.add('d-none');
     $('app-section').classList.remove('d-none');
     $('dashboard-section').classList.add('d-none');
@@ -179,8 +181,28 @@ async function loadApp() {
     $('user-name').textContent = state.user.username;
     $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
 
-    await loadSports();
-    await loadGames();
+    // Data-loading errors must not log the user out.
+    try {
+        await loadSports();
+        await loadGames();
+    } catch (error) {
+        showAlert(error.message || 'Could not load PlayLink data. Please try again.', 'danger');
+    }
+}
+
+async function restoreSession() {
+    if (!state.access && !state.refresh) {
+        return;
+    }
+
+    try {
+        await loadApp();
+    } catch (error) {
+        // apiFetch already attempts the refresh token when the access token
+        // has expired. Clear local credentials only when /auth/me/ cannot
+        // restore the authenticated session.
+        clearTokens();
+    }
 }
 
 async function loadSports() {
@@ -661,8 +683,4 @@ $('game-sport').addEventListener('change', () => {
 
 $('edit-game-sport').addEventListener('change', toggleEditCustomSport);
 
-if (state.access) {
-    loadApp().catch(() => {
-        clearTokens();
-    });
-}
+restoreSession();
