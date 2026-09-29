@@ -1139,6 +1139,28 @@ $('nav-dashboard-btn').addEventListener('click', showDashboard);
 $('nav-create-btn').addEventListener('click', showCreateGamePage);
 $('nav-profile-btn').addEventListener('click', showProfile);
 $('nav-logout-btn').addEventListener('click', logout);
+$('profile-picture').addEventListener('change', () => {
+    const file = $('profile-picture').files[0];
+
+    if (!file) {
+        renderProfile(state.profile || state.user || {});
+        return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+        showProfileMessage('Please choose an image file.');
+        $('profile-picture').value = '';
+        return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    const preview = `<img src="${previewUrl}" alt="Profile picture preview" class="profile-page-avatar-image">`;
+
+    $('profile-page-avatar').innerHTML = preview;
+    $('profile-upload-avatar').innerHTML = preview;
+    clearProfileMessage();
+});
+
 $('profile-form').addEventListener('submit', saveProfile);
 $('profile-cancel-btn').addEventListener('click', () => {
     renderProfile(state.profile || state.user || {});
