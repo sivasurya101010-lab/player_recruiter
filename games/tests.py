@@ -270,3 +270,230 @@ class GameTestCase(TestCase):
             response.data['custom_sport_name'],
             'Volleyball'
         )
+
+
+    def test_player_can_leave_game(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        self.client.force_authenticate(user=self.other_user)
+
+        join_response = self.client.post(
+            f'/api/game/{game_id}/join/',
+            {},
+            format='json'
+        )
+
+        self.assertEqual(join_response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.post(
+            f'/api/game/{game_id}/leave/',
+            {},
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(
+            GamePlayer.objects.filter(
+                game_id=game_id,
+                user=self.other_user
+            ).exists()
+        )
+
+    def test_leaving_full_game_changes_status_to_open(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        user3 = User.objects.create_user(
+            username='player3',
+            email='player3@test.com',
+            password='TestPassword123'
+        )
+
+        self.client.force_authenticate(user=self.other_user)
+        self.client.post(
+            f'/api/game/{game_id}/join/',
+            {},
+            format='json'
+        )
+
+        self.client.force_authenticate(user=user3)
+        response = self.client.post(
+            f'/api/game/{game_id}/join/',
+            {},
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            Game.objects.get(id=game_id).status,
+            Game.Status.FULL
+        )
+
+        self.client.force_authenticate(user=self.other_user)
+        response = self.client.post(
+            f'/api/game/{game_id}/leave/',
+            {},
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            Game.objects.get(id=game_id).status,
+            Game.Status.OPEN
+        )
+
+    def test_game_creator_cannot_leave_game(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        response = self.client.post(
+            f'/api/game/{game_id}/leave/',
+            {},
+            format='json'
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
+        self.assertTrue(
+            GamePlayer.objects.filter(
+                game_id=game_id,
+                user=self.user
+            ).exists()
+        )
+
+    def test_player_can_view_game_players(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        self.client.force_authenticate(user=self.other_user)
+        self.client.post(
+            f'/api/game/{game_id}/join/',
+            {},
+            format='json'
+        )
+
+        response = self.client.get(
+            f'/api/game/{game_id}/players/'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        usernames = [player['username'] for player in response.data]
+        self.assertIn('surya', usernames)
+        self.assertIn('player2', usernames)
+
+    def test_only_creator_can_edit_game(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        self.client.force_authenticate(user=self.other_user)
+
+        response = self.client.patch(
+            f'/api/game/{game_id}/edit/',
+            {'title': 'Changed title'},
+            format='json'
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN
+        )
+
+    def test_creator_can_edit_game(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        response = self.client.patch(
+            f'/api/game/{game_id}/edit/',
+            {'title': 'Changed title'},
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], 'Changed title')
+
+    def test_creator_can_cancel_game(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        response = self.client.post(
+            f'/api/game/{game_id}/cancel/',
+            {},
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            Game.objects.get(id=game_id).status,
+            Game.Status.CANCELLED
+        )
+
+    def test_only_creator_can_cancel_game(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        self.client.force_authenticate(user=self.other_user)
+
+        response = self.client.post(
+            f'/api/game/{game_id}/cancel/',
+            {},
+            format='json'
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN
+        )
+
+    def test_creator_can_delete_game(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        response = self.client.delete(
+            f'/api/game/{game_id}/delete/'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Game.objects.filter(id=game_id).exists())
+
+    def test_only_creator_can_delete_game(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        self.client.force_authenticate(user=self.other_user)
+
+        response = self.client.delete(
+            f'/api/game/{game_id}/delete/'
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN
+        )
+
+    def test_cannot_reduce_players_needed_below_current_players(self):
+        create_response = self.create_game()
+        game_id = create_response.data['id']
+
+        self.client.force_authenticate(user=self.other_user)
+        self.client.post(
+            f'/api/game/{game_id}/join/',
+            {},
+            format='json'
+        )
+
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.patch(
+            f'/api/game/{game_id}/edit/',
+            {'players_needed': 1},
+            format='json'
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST
+        )
+        self.assertIn('players_needed', response.data)
