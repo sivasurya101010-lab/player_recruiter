@@ -624,3 +624,89 @@ body {
         width: 100%;
     }
 }
+
+
+/* Phase 2 - Game cards */
+.game-card {
+    border: 1px solid #e0e8ee;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.game-card:hover {
+    transform: translateY(-3px);
+}
+
+.game-sport {
+    color: #00a878;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+}
+
+.game-role {
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: #eef4f8;
+    color: #607b90;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.game-status {
+    flex-shrink: 0;
+    padding: 6px 9px;
+    font-size: 11px;
+    letter-spacing: 0.4px;
+}
+
+.badge-cancelled {
+    background: #dc3545;
+}
+
+.badge-completed {
+    background: #0d6efd;
+}
+
+.game-description {
+    min-height: 42px;
+    line-height: 1.45;
+}
+
+.game-details {
+    border-top: 1px solid #edf1f4;
+    border-bottom: 1px solid #edf1f4;
+    padding: 10px 0;
+}
+
+.game-detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 6px 0;
+    color: #405a6d;
+    font-size: 13px;
+}
+
+.game-detail-label {
+    flex-shrink: 0;
+    color: #8295a3;
+    font-weight: 600;
+}
+
+.game-actions .btn {
+    min-width: 88px;
+}
+
+@media (max-width: 575px) {
+    .game-detail-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .game-actions .btn {
+        flex: 1;
+    }
+}
