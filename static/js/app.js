@@ -872,19 +872,29 @@ async function createGame(event) {
     event.preventDefault();
     clearCreateGameError();
 
+    const selectedSport = state.sports.find(
+        (sport) => String(sport.id) === $('game-sport').value
+    );
+
+    if (selectedSport?.name === 'Other' && !$('custom-sport').value.trim()) {
+        showCreateGameError('Please enter the custom sport name.');
+        $('custom-sport').focus();
+        return;
+    }
+
     const button = $('create-game-btn');
     button.disabled = true;
-    button.textContent = 'Creating...';
+    button.innerHTML = 'Creating...';
 
     const data = {
         sport: Number($('game-sport').value),
-        custom_sport_name: $('custom-sport').value,
-        title: $('game-title').value,
-        description: $('game-description').value,
+        custom_sport_name: $('custom-sport').value.trim(),
+        title: $('game-title').value.trim(),
+        description: $('game-description').value.trim(),
         date: $('game-date').value,
         start_time: $('game-time').value,
         duration: Number($('game-duration').value),
-        location: $('game-location').value,
+        location: $('game-location').value.trim(),
         players_needed: Number($('game-players').value)
     };
 
@@ -898,12 +908,13 @@ async function createGame(event) {
         $('game-form').reset();
         $('custom-sport-wrap').classList.add('d-none');
         await loadGames();
+        await showDashboard();
     } catch (error) {
         showCreateGameError(error.message);
         showAlert(error.message, 'danger');
     } finally {
         button.disabled = false;
-        button.textContent = 'Create game';
+        button.innerHTML = 'Create game <span aria-hidden="true">→</span>';
     }
 }
 
@@ -1049,6 +1060,7 @@ $('game-date').min = today;
 $('edit-game-date').min = today;
 
 $('game-form').addEventListener('input', clearCreateGameError);
+$('cancel-create-game-btn').addEventListener('click', showHome);
 $('edit-game-form').addEventListener('submit', saveGameEdit);
 $('filter-sport').addEventListener('change', loadGames);
 
