@@ -35,8 +35,20 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Install dependencies
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Python dependencies
         run: pip install -r requirements.txt
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Run frontend tests
+        run: npm test
 
       - name: Run pytest tests
         env:
