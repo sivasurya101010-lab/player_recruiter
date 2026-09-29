@@ -140,3 +140,28 @@ class UserTestCase(TestCase):
             refresh_check.status_code,
             status.HTTP_401_UNAUTHORIZED
         )
+
+
+    def test_refresh_token_can_restore_session(self):
+        self.create_user()
+        login_response = self.client.post(
+            '/api/auth/login/',
+            {'username': 'surya', 'password': 'TestPassword123'},
+            format='json'
+        )
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+        refresh_response = self.client.post(
+            '/api/auth/refresh/',
+            {'refresh': login_response.data['refresh']},
+            format='json'
+        )
+        self.assertEqual(refresh_response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', refresh_response.data)
+
+    def test_invalid_refresh_token_is_rejected(self):
+        response = self.client.post(
+            '/api/auth/refresh/',
+            {'refresh': 'invalid-token'},
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
