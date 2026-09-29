@@ -709,22 +709,66 @@ async function leaveGame(id) {
 
 async function showPlayers(id) {
     try {
-        const players = await apiFetch(`/game/${id}/players/`);
-        $('players-list').innerHTML = players.length
-            ? players.map((player) => `
-                <div class="border rounded p-2 mb-2">
-                    <strong>${escapeHtml(player.username)}</strong>
-                    <div class="text-muted small">
-                        ${escapeHtml(
-                            [player.first_name, player.last_name].filter(Boolean).join(' ') ||
-                            player.email
-                        )}
-                    </div>
-                </div>
-            `).join('')
-            : '<p class="text-muted mb-0">No players found.</p>';
+        const [players, game] = await Promise.all([
+            apiFetch(`/game/${id}/players/`),
+            apiFetch(`/game/${id}/`)
+        ]);
 
-        $('players-modal-title').textContent = 'Game players';
+        $('players-modal-title').textContent = game.title || 'Game players';
+        $('players-modal-count').textContent =
+            `${players.length} player${players.length === 1 ? '' : 's'} joined`;
+
+        $('players-list').innerHTML = players.length
+            ? players.map((player) => {
+                const name = getCreatorName(player);
+                const initials = name
+                    .split(/\\s+/)
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((part) => part.charAt(0).toUpperCase())
+                    .join('') || '?';
+
+                const isCreator = player.id === game.creator?.id;
+                const location = player.location || 'Location not added';
+                const bio = player.bio || 'No bio added yet.';
+                const profilePicture = player.profile_picture
+                    ? `<img src="${escapeHtml(player.profile_picture)}" alt="" class="players-modal-avatar-image">`
+                    : `<span>${escapeHtml(initials)}</span>`;
+
+                return `
+                    <article class="players-modal-card">
+                        <div class="players-modal-avatar">
+                            ${profilePicture}
+                        </div>
+
+                        <div class="players-modal-player-info">
+                            <div class="players-modal-name-row">
+                                <strong>${escapeHtml(name)}</strong>
+                                ${isCreator ? '<span class="players-modal-creator-badge">Creator</span>' : ''}
+                            </div>
+
+                            <span class="players-modal-username">
+                                @${escapeHtml(player.username || 'player')}
+                            </span>
+
+                            <div class="players-modal-location">
+                                <span>📍</span>
+                                <span>${escapeHtml(location)}</span>
+                            </div>
+
+                            <p class="players-modal-bio">${escapeHtml(bio)}</p>
+                        </div>
+                    </article>
+                `;
+            }).join('')
+            : `
+                <div class="players-modal-empty">
+                    <div class="players-modal-empty-icon">👥</div>
+                    <strong>No players have joined yet</strong>
+                    <span>Be the first player to join this game.</span>
+                </div>
+            `;
+
         bootstrap.Modal.getOrCreateInstance($('players-modal')).show();
     } catch (error) {
         showAlert(error.message, 'danger');
