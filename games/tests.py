@@ -540,3 +540,14 @@ class GameTestCase(TestCase):
             Game.objects.get(id=game_id).status,
             Game.Status.OPEN
         )
+
+
+    def test_game_list_is_newest_first(self):
+        first = self.create_game()
+        first_game = Game.objects.get(id=first.data['id'])
+        self.game_data['title'] = 'Newer Football'
+        self.create_game()
+        response = self.client.get('/api/game/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['title'], 'Newer Football')
+        self.assertEqual(response.data[1]['title'], first_game.title)
