@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -281,3 +282,42 @@ def test_unauthenticated_user_cannot_update_profile(api_client):
     )
 
     assert response.status_code == 401
+
+
+@pytest.mark.django_db
+def test_authenticated_user_can_update_phone_number(api_client, user):
+    api_client.force_authenticate(user=user)
+
+    response = api_client.patch(
+        '/api/auth/me/',
+        {'phone_number': '+91 9876543210'},
+        format='json',
+    )
+
+    assert response.status_code == 200
+    assert response.data['phone_number'] == '+91 9876543210'
+
+    user.refresh_from_db()
+    assert user.phone_number == '+91 9876543210'
+
+
+@pytest.mark.django_db
+def test_authenticated_user_can_upload_profile_picture(api_client, user):
+    api_client.force_authenticate(user=user)
+
+    image = SimpleUploadedFile(
+        'profile.jpg',
+        b'fake-image-content',
+        content_type='image/jpeg',
+    )
+
+    response = api_client.patch(
+        '/api/auth/me/',
+        {'profile_picture': image},
+        format='multipart',
+    )
+
+    assert response.status_code == 200
+    assert response.data['profile_picture']
+    user.refresh_from_db()
+    assert user.profile_picture.name.startswith('profile_picture/')
