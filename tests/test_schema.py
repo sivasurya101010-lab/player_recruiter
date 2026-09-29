@@ -53,11 +53,11 @@ def test_openapi_schema_documents_jwt_authentication():
 def test_openapi_marks_protected_and_public_endpoints_correctly():
     client = APIClient()
 
-    response = client.get('/api/schema/')
+    response = client.get('/api/schema/', HTTP_ACCEPT='application/json')
 
     assert response.status_code == 200
 
-    schema = response.json()
+    schema = json.loads(response.content)
     paths = schema['paths']
 
     assert paths['/api/game/']['get']['security']
