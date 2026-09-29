@@ -390,3 +390,35 @@ body {
         font-size: 34px;
     }
 }
+
+/* Uploaded PlayLink login artwork */
+.auth-hero {
+    padding: 0;
+    background: #ffffff;
+    min-height: 0;
+    aspect-ratio: 914 / 1024;
+}
+
+.auth-hero-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left center;
+}
+
+@media (max-width: 991px) {
+    .auth-hero {
+        aspect-ratio: 914 / 1024;
+    }
+
+    .auth-hero-image {
+        object-position: left top;
+    }
+}
+
+@media (max-width: 575px) {
+    .auth-hero {
+        max-height: 500px;
+    }
+}
