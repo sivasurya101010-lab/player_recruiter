@@ -422,3 +422,30 @@ body {
         max-height: 500px;
     }
 }
+
+
+.auth-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: -2px 0 22px;
+}
+
+.show-password-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #668096;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.show-password-option input {
+    width: 14px;
+    height: 14px;
+    accent-color: #00a878;
+}
+
+.forgot-button {
+    font-size: 12px;
+}
