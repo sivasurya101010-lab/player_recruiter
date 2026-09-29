@@ -1300,3 +1300,99 @@ body {
         min-width: 245px;
     }
 }
+
+
+/* Game card -> full details interaction */
+.explore-game-card {
+    cursor: pointer;
+}
+
+.explore-game-card:focus-visible {
+    outline: 2px solid #0879c9;
+    outline-offset: 3px;
+}
+
+.explore-game-card-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+    margin: 6px 0 14px;
+    color: #4e5b64;
+}
+
+.explore-game-card-details span {
+    overflow: hidden;
+    max-width: 100%;
+    text-overflow: ellipsis;
+}
+
+.game-details-modal {
+    border: 0;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.game-details-modal .modal-header {
+    padding: 20px 22px 16px;
+    border-bottom: 1px solid #edf1f4;
+}
+
+.game-details-modal .modal-body {
+    padding: 20px 22px 24px;
+}
+
+.game-details-modal-sport {
+    color: #00a878;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.game-details-modal .modal-title {
+    color: #17212b;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.game-details-modal-description {
+    margin-bottom: 18px;
+    color: #68757e;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.game-details-modal-list {
+    border-top: 1px solid #edf1f4;
+}
+
+.game-detail-modal-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 11px 0;
+    border-bottom: 1px solid #edf1f4;
+    color: #344954;
+    font-size: 14px;
+}
+
+.game-detail-modal-label {
+    flex-shrink: 0;
+    color: #8295a3;
+    font-weight: 600;
+}
+
+@media (max-width: 575px) {
+    .game-details-modal .modal-header,
+    .game-details-modal .modal-body {
+        padding-left: 17px;
+        padding-right: 17px;
+    }
+
+    .game-detail-modal-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 3px;
+    }
+}
