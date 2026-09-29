@@ -819,3 +819,18 @@ body {
 #dashboard-section {
     padding-bottom: 30px;
 }
+
+
+.menu-item-logout {
+    color: #c0392b;
+    margin-top: 18px;
+    border-top: 1px solid #e5ebef;
+    border-radius: 0;
+    padding-top: 18px;
+}
+
+.menu-item-logout:hover,
+.menu-item-logout:focus {
+    color: #a93226;
+    background: #fff5f4;
+}
