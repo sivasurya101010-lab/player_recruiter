@@ -5,6 +5,8 @@ from django.db import transaction
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 
 from .models import Game, GamePlayer
+from .filters import GameFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import GameSerializer
 from users.models import User
 from users.serializers import UserSerializer
@@ -36,6 +38,8 @@ class GameListView(generics.ListAPIView):
 
     serializer_class = GameSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = GameFilter
 
     @extend_schema(
         summary="List games",
@@ -73,22 +77,7 @@ class GameListView(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = Game.objects.all().order_by('-created_at')
-
-        sport = self.request.query_params.get('sport')
-        date = self.request.query_params.get('date')
-        status_filter = self.request.query_params.get('status')
-
-        if sport:
-            queryset = queryset.filter(sport_id=sport)
-
-        if date:
-            queryset = queryset.filter(date=date)
-
-        if status_filter:
-            queryset = queryset.filter(status=status_filter)
-
-        return queryset
+        return Game.objects.select_related('creator', 'sport').prefetch_related('participation').order_by('-created_at')
 
 
 class GameDetailView(generics.RetrieveAPIView):
