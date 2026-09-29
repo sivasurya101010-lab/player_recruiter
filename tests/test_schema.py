@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from rest_framework.test import APIClient
 
@@ -10,7 +12,7 @@ def test_openapi_schema_contains_playlink_endpoints():
 
     assert response.status_code == 200
 
-    schema = response.json()
+    schema = json.loads(response.content)
     paths = schema['paths']
 
     assert '/api/auth/login/' in paths
