@@ -54,6 +54,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'username']
 
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exclude(pk=self.instance.pk).exists():
+            raise serializers.ValidationError("User already exists")
+        return value
+
 
 class LogoutSerializer(TokenBlacklistSerializer):
     pass
