@@ -1606,3 +1606,192 @@ body {
         gap: 3px;
     }
 }
+
+
+/* Players modal */
+.players-modal {
+    overflow: hidden;
+    border: 0;
+    border-radius: 20px;
+    box-shadow: 0 20px 55px rgba(20, 35, 45, 0.18);
+}
+
+.players-modal .modal-header {
+    padding: 21px 24px 17px;
+    border-bottom: 1px solid #edf1f4;
+}
+
+.players-modal .modal-title {
+    color: #17212b;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.players-modal-count {
+    display: block;
+    margin-top: 3px;
+    color: #8797a2;
+    font-size: 12px;
+}
+
+.players-modal .modal-body {
+    max-height: 65vh;
+    overflow-y: auto;
+    padding: 18px 24px 24px;
+}
+
+.players-modal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.players-modal-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 13px;
+    border: 1px solid #e7edf1;
+    border-radius: 13px;
+    background: #ffffff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.players-modal-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(25, 45, 60, 0.07);
+}
+
+.players-modal-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #e9f3f8;
+    color: #0879c9;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.players-modal-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.players-modal-player-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.players-modal-name-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.players-modal-name-row strong {
+    color: #26343d;
+    font-size: 14px;
+}
+
+.players-modal-creator-badge {
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: #e8f7ef;
+    color: #16804d;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.players-modal-username {
+    display: block;
+    margin-top: 1px;
+    color: #8797a2;
+    font-size: 11px;
+}
+
+.players-modal-location {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 7px;
+    color: #5e707c;
+    font-size: 11px;
+}
+
+.players-modal-location span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.players-modal-bio {
+    overflow: hidden;
+    margin: 4px 0 0;
+    color: #7b8a94;
+    font-size: 11px;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.players-modal-empty {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 180px;
+    padding: 25px;
+    border: 1px dashed #d8e2e8;
+    border-radius: 14px;
+    background: #fafcfd;
+    text-align: center;
+}
+
+.players-modal-empty-icon {
+    margin-bottom: 9px;
+    font-size: 29px;
+}
+
+.players-modal-empty strong {
+    color: #364750;
+    font-size: 14px;
+}
+
+.players-modal-empty span {
+    margin-top: 4px;
+    color: #8797a2;
+    font-size: 12px;
+}
+
+@media (max-width: 575px) {
+    .players-modal {
+        border-radius: 16px;
+    }
+
+    .players-modal .modal-header {
+        padding: 18px 17px 15px;
+    }
+
+    .players-modal .modal-body {
+        padding: 15px 17px 18px;
+    }
+
+    .players-modal-card {
+        align-items: flex-start;
+        padding: 11px;
+    }
+
+    .players-modal-avatar {
+        width: 43px;
+        height: 43px;
+    }
+}
