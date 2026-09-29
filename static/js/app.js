@@ -10,12 +10,70 @@ const state = {
 const $ = (id) => document.getElementById(id);
 
 function showAlert(message, type = 'info') {
-    $('alert-box').innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${escapeHtml(message)}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    const alertBox = $('alert-box');
+
+    alertBox.innerHTML = `
+        <div class="app-toast app-toast-${type}" role="alert">
+            <div>${escapeHtml(message)}</div>
+            <button type="button" class="app-toast-close" aria-label="Close">&times;</button>
         </div>
     `;
+
+    const toast = alertBox.querySelector('.app-toast');
+    const closeButton = alertBox.querySelector('.app-toast-close');
+
+    closeButton.addEventListener('click', () => toast.remove());
+
+    setTimeout(() => {
+        if (toast.isConnected) {
+            toast.classList.add('app-toast-hide');
+            setTimeout(() => toast.remove(), 200);
+        }
+    }, 4000);
+}
+
+function getErrorMessage(data, status) {
+    if (status === 401) {
+        return 'Invalid username or password.';
+    }
+
+    if (data.username) {
+        const message = Array.isArray(data.username) ? data.username[0] : data.username;
+        if (String(message).toLowerCase().includes('already')) {
+            return 'Username already taken. Please choose another username.';
+        }
+        return message;
+    }
+
+    if (data.email) {
+        const message = Array.isArray(data.email) ? data.email[0] : data.email;
+        if (String(message).toLowerCase().includes('already')) {
+            return 'Email is already registered.';
+        }
+        return message;
+    }
+
+    if (data.password) {
+        return Array.isArray(data.password)
+            ? data.password.join(' ')
+            : data.password;
+    }
+
+    if (data.detail) {
+        return data.detail;
+    }
+
+    if (data.non_field_errors) {
+        return Array.isArray(data.non_field_errors)
+            ? data.non_field_errors.join(' ')
+            : data.non_field_errors;
+    }
+
+    const messages = Object.values(data)
+        .flat()
+        .filter(Boolean);
+
+    return messages.length ? messages.join(' ') : 'Something went wrong. Please try again.';
 }
 
 function escapeHtml(value) {
@@ -62,8 +120,7 @@ async function apiFetch(path, options = {}, retry = true) {
     }
 
     if (!response.ok) {
-        const message = data.detail || Object.values(data).flat().join(' ') || 'Request failed';
-        throw new Error(message);
+        throw new Error(getErrorMessage(data, response.status));
     }
 
     return data;
@@ -448,6 +505,7 @@ $('login-form').addEventListener('submit', async (event) => {
 
     try {
         await login($('login-username').value, $('login-password').value);
+        showAlert('Logged in successfully. Welcome back!', 'success');
     } catch (error) {
         showAlert(error.message, 'danger');
     }
@@ -458,6 +516,7 @@ $('register-form').addEventListener('submit', async (event) => {
 
     try {
         await register();
+        showAlert('Account created successfully. Welcome to PlayLink!', 'success');
     } catch (error) {
         showAlert(error.message, 'danger');
     }
@@ -470,6 +529,14 @@ $('filter-sport').addEventListener('change', loadGames);
 $('filter-date').addEventListener('change', loadGames);
 $('filter-status').addEventListener('change', loadGames);
 $('logout-btn').addEventListener('click', logout);
+
+$('google-login-btn')?.addEventListener('click', () => {
+    showAlert('Google login is not available yet.', 'info');
+});
+
+$('forgot-password-btn')?.addEventListener('click', () => {
+    showAlert('Password reset is not available yet. Please contact support.', 'info');
+});
 
 $('game-sport').addEventListener('change', () => {
     const selected = state.sports.find(
