@@ -106,6 +106,14 @@ async function apiFetch(path, options = {}, retry = true) {
             const data = await refreshResponse.json();
             state.access = data.access;
             localStorage.setItem('playerRecruiterAccess', data.access);
+
+            // Keep the newest refresh token if the server rotates refresh
+            // tokens in the future.
+            if (data.refresh) {
+                state.refresh = data.refresh;
+                localStorage.setItem('playerRecruiterRefresh', data.refresh);
+            }
+
             return apiFetch(path, options, false);
         }
     }
