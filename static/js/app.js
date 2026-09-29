@@ -194,7 +194,7 @@ async function loadApp() {
     $('create-section').classList.add('d-none');
     $('menu-btn').classList.remove('d-none');
     $('app-nav-menu').classList.remove('d-none');
-    $('user-name').textContent = state.user.username;
+    $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
     $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
 
     if (results[0].status === 'rejected') {
@@ -615,7 +615,7 @@ async function logout() {
     $('create-section').classList.add('d-none');
     $('menu-btn').classList.add('d-none');
     $('app-nav-menu').classList.add('d-none');
-    $('user-name').textContent = '';
+    $('dashboard-user-name').textContent = '';
 }
 
 function toggleEditCustomSport() {
