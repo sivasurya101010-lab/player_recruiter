@@ -56,16 +56,23 @@ class Command(BaseCommand):
             user.is_superuser = True
             changed.append("is_superuser")
 
+        # Keep the Render admin password synchronized with the value stored
+        # in the Render environment. This also fixes an existing superuser
+        # whose local/development password does not match production.
+        if not user.check_password(password):
+            user.set_password(password)
+            changed.append("password")
+
         if changed:
             user.save(update_fields=changed)
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Promoted existing user '{username}' to superuser."
+                    f"Verified/updated Django superuser '{username}'."
                 )
             )
         else:
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Superuser '{username}' already exists and is ready."
+                    f"Superuser '{username}' is already ready."
                 )
             )
