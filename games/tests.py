@@ -27,7 +27,7 @@ class GameTestCase(TestCase):
             password='TestPassword123'
         )
 
-        self.sport = Sports.objects.create(name='Football')
+        self.sport = Sports.objects.get(name='Football')
 
         self.game_data = {
             'sport': self.sport.id,
@@ -243,9 +243,21 @@ class GameTestCase(TestCase):
             status.HTTP_400_BAD_REQUEST
         )
 
-    def test_other_sport_requires_custom_name(self):
-        other = Sports.objects.create(name='Other')
+    def test_developer_created_other_sport_can_be_selected(self):
+        other = Sports.objects.get(name='Other')
         self.game_data['sport'] = other.id
+
+        response = self.create_game()
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED
+        )
+        self.assertEqual(response.data['sport'], other.id)
+        self.assertEqual(response.data['custom_sport_name'], '')
+
+    def test_custom_sport_name_is_rejected(self):
+        self.game_data['custom_sport_name'] = 'Volleyball'
 
         response = self.create_game()
 
@@ -254,22 +266,6 @@ class GameTestCase(TestCase):
             status.HTTP_400_BAD_REQUEST
         )
         self.assertIn('custom_sport_name', response.data)
-
-    def test_other_sport_accepts_custom_name(self):
-        other = Sports.objects.create(name='Other')
-        self.game_data['sport'] = other.id
-        self.game_data['custom_sport_name'] = 'Volleyball'
-
-        response = self.create_game()
-
-        self.assertEqual(
-            response.status_code,
-            status.HTTP_201_CREATED
-        )
-        self.assertEqual(
-            response.data['custom_sport_name'],
-            'Volleyball'
-        )
 
 
     def test_player_can_leave_game(self):
