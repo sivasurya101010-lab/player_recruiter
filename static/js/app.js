@@ -848,7 +848,6 @@ async function editGame(id) {
         $('edit-game-id').value = game.id;
         $('edit-game-title').value = game.title;
         $('edit-game-sport').value = game.sport;
-        $('edit-custom-sport').value = game.custom_sport_name || '';
         $('edit-game-date').value = game.date;
         $('edit-game-time').value = game.start_time.slice(0, 5);
         $('edit-game-duration').value = game.duration;
@@ -870,7 +869,6 @@ async function saveGameEdit(event) {
     const id = $('edit-game-id').value;
     const data = {
         sport: Number($('edit-game-sport').value),
-        custom_sport_name: $('edit-custom-sport').value,
         title: $('edit-game-title').value,
         description: $('edit-game-description').value,
         date: $('edit-game-date').value,
@@ -927,23 +925,12 @@ async function createGame(event) {
     event.preventDefault();
     clearCreateGameError();
 
-    const selectedSport = state.sports.find(
-        (sport) => String(sport.id) === $('game-sport').value
-    );
-
-    if (selectedSport?.name === 'Other' && !$('custom-sport').value.trim()) {
-        showCreateGameError('Please enter the custom sport name.');
-        $('custom-sport').focus();
-        return;
-    }
-
     const button = $('create-game-btn');
     button.disabled = true;
     button.innerHTML = 'Creating...';
 
     const data = {
         sport: Number($('game-sport').value),
-        custom_sport_name: $('custom-sport').value.trim(),
         title: $('game-title').value.trim(),
         description: $('game-description').value.trim(),
         date: $('game-date').value,
@@ -998,14 +985,8 @@ async function logout() {
 }
 
 function toggleEditCustomSport() {
-    const selected = state.sports.find(
-        (sport) => String(sport.id) === $('edit-game-sport').value
-    );
-
-    $('edit-custom-sport-wrap').classList.toggle(
-        'd-none',
-        selected?.name !== 'Other'
-    );
+    // Sports are developer-managed. Users can only select an existing sport.
+    $('edit-custom-sport-wrap').classList.add('d-none');
 }
 
 function showRegisterPanel() {
@@ -1318,14 +1299,8 @@ $('forgot-password-btn')?.addEventListener('click', () => {
 });
 
 $('game-sport').addEventListener('change', () => {
-    const selected = state.sports.find(
-        (sport) => String(sport.id) === $('game-sport').value
-    );
-
-    $('custom-sport-wrap').classList.toggle(
-        'd-none',
-        selected?.name !== 'Other'
-    );
+    // The selected sport must always come from the developer-managed list.
+    $('custom-sport-wrap').classList.add('d-none');
 });
 
 $('edit-game-sport').addEventListener('change', toggleEditCustomSport);
