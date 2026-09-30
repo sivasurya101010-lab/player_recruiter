@@ -87,7 +87,7 @@ function getProfilePictureUrl(value) {
     if (!raw) return '';
 
     // Django can return either an absolute media URL or the stored ImageField path.
-        if (/^https?:\/\//i.test(raw)) {
+    if (/^https?:\/\//i.test(raw)) {
         return raw;
     }
 
