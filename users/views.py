@@ -1,6 +1,7 @@
 from mimetypes import guess_type
 
 from django.http import FileResponse
+from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
@@ -39,7 +40,7 @@ class RefreshTokenView(TokenRefreshView):
         summary="Refresh access token",
         description="Use a valid refresh token to obtain a new access token.",
         responses={
-            200: UserSerializer,
+            200: OpenApiResponse(description="New access token returned successfully."),
             401: OpenApiResponse(description="Invalid or expired refresh token."),
         },
         auth=[],
@@ -96,7 +97,7 @@ class ProfilePictureView(generics.GenericAPIView):
         user = get_object_or_404(User, pk=pk)
 
         if not user.profile_picture:
-            return OpenApiResponse(status_code=404)
+            return Response({'detail': 'Profile picture not found.'}, status=404)
 
         content_type = guess_type(user.profile_picture.name)[0] or 'application/octet-stream'
 
@@ -106,7 +107,7 @@ class ProfilePictureView(generics.GenericAPIView):
                 content_type=content_type,
             )
         except FileNotFoundError:
-            return OpenApiResponse(status_code=404)
+            return Response({'detail': 'Profile picture file not found.'}, status=404)
 
         response['Cache-Control'] = 'public, max-age=86400'
         return response
