@@ -3,7 +3,6 @@ from mimetypes import guess_type
 from django.http import FileResponse
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
 
 from rest_framework import generics
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenObtainPairView, TokenRefreshView
