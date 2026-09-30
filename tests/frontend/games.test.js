@@ -24,7 +24,7 @@ const ids = [
     'profile-form-message','profile-first-name','profile-last-name','profile-email',
     'profile-location','profile-phone','profile-bio','profile-save-btn',
     'joined-games-list','dashboard-joined-count','dashboard-upcoming-count',
-    'dashboard-hosted-count','create-game-errors','game-details-modal','game-details-title',
+    'dashboard-hosted-count','create-game-errors','create-game-btn','game-details-modal','game-details-title',
     'game-details-sport','game-details-status','game-details-location','game-details-date',
     'game-details-time','game-details-description','game-details-list',
     'game-details-creator-name','game-details-creator-username','game-details-created-at',
@@ -60,6 +60,7 @@ function createApp(fetchImpl) {
         '<button id="profile-save-btn">Save changes</button></form>';
     doc.getElementById('edit-game-form').outerHTML = '<form id="edit-game-form"></form>';
     doc.getElementById('game-form').outerHTML = '<form id="game-form"></form>';
+    doc.getElementById('create-game-btn').outerHTML = '<button id="create-game-btn"></button>';
 
     const calls = [];
     const context = vm.createContext({
