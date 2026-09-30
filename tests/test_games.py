@@ -31,11 +31,7 @@ def users():
 
 @pytest.fixture
 def sport():
-    return Sports.objects.create(
-        name='Football',
-        description='Football games',
-        is_active=True,
-    )
+    return Sports.objects.get(name='Football')
 
 
 @pytest.fixture
@@ -204,11 +200,30 @@ def test_duration_must_be_positive(api_client, users, game_data):
 
 
 @pytest.mark.django_db
-def test_other_sport_requires_custom_name(api_client, users, game_data):
+def test_developer_created_other_sport_can_be_selected(api_client, users, game_data):
     creator, _ = users
     api_client.force_authenticate(user=creator)
-    other = Sports.objects.create(name='Other', is_active=True)
+
+    other = Sports.objects.get(name='Other')
     game_data['sport'] = other.id
+
+    response = api_client.post(
+        '/api/game/create/',
+        game_data,
+        format='json',
+    )
+
+    assert response.status_code == 201
+    assert response.data['sport'] == other.id
+    assert response.data['custom_sport_name'] == ''
+
+
+@pytest.mark.django_db
+def test_custom_sport_name_is_rejected(api_client, users, game_data):
+    creator, _ = users
+    api_client.force_authenticate(user=creator)
+
+    game_data['custom_sport_name'] = 'Volleyball'
 
     response = api_client.post(
         '/api/game/create/',
@@ -218,24 +233,6 @@ def test_other_sport_requires_custom_name(api_client, users, game_data):
 
     assert response.status_code == 400
     assert 'custom_sport_name' in response.data
-
-
-@pytest.mark.django_db
-def test_other_sport_accepts_custom_name(api_client, users, game_data):
-    creator, _ = users
-    api_client.force_authenticate(user=creator)
-    other = Sports.objects.create(name='Other', is_active=True)
-    game_data['sport'] = other.id
-    game_data['custom_sport_name'] = 'Volleyball'
-
-    response = api_client.post(
-        '/api/game/create/',
-        game_data,
-        format='json',
-    )
-
-    assert response.status_code == 201
-    assert response.data['custom_sport_name'] == 'Volleyball'
 
 
 @pytest.mark.django_db
