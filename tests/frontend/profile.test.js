@@ -48,7 +48,9 @@ function createApp() {
         'edit-custom-sport'
     ]) {
         dom.window.document.getElementById(id).outerHTML =
-            '<input id="' + id + '">';
+            id === 'profile-picture'
+            ? '<input id="profile-picture" type="file">'
+            : '<input id="' + id + '">';
     }
 
     dom.window.document.getElementById('profile-form').outerHTML =
