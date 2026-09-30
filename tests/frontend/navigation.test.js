@@ -54,7 +54,11 @@ function createApp(fetchImpl = async () => ({
         setTimeout, clearTimeout, console, confirm: () => true,
         bootstrap: {
             Offcanvas: {
-                getOrCreateInstance: () => ({hide() {}})
+                getOrCreateInstance: () => ({
+                    hide() {
+                        doc.getElementById('app-nav-menu')?.classList.remove('show');
+                    }
+                })
             },
             Modal: {
                 getOrCreateInstance: () => ({show() {}, hide() {}})
