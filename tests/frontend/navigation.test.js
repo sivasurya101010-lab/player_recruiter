@@ -11,7 +11,7 @@ const ids = [
     'create-section','profile-section','menu-btn','app-nav-menu','dashboard-user-name',
     'login-panel','register-panel','navbar-home-link','nav-home-btn','nav-dashboard-btn',
     'nav-create-btn','nav-profile-btn','nav-logout-btn','profile-form',
-    'profile-cancel-btn','show-register-btn','show-login-btn','login-form','register-form','login-show-password','login-password','register-show-password','register-password','login-username','profile-picture','game-sport','edit-game-sport','game-form',
+    'profile-cancel-btn','show-register-btn','show-login-btn','login-form','register-form','login-show-password','login-password','register-show-password','register-password','login-username','profile-picture','game-sport','edit-game-sport','game-date','edit-game-date','game-form',
     'cancel-create-game-btn','see-more-games-btn','filter-sport','filter-date',
     'filter-status','games-list','explore-sport-tabs','joined-games-list',
     'profile-page-name','profile-page-username','profile-page-avatar',
@@ -31,7 +31,7 @@ function createApp(fetchImpl = async () => ({
 
     doc.getElementById('login-form').outerHTML = '<form id="login-form"></form>';
     doc.getElementById('register-form').outerHTML = '<form id="register-form"></form>';
-    for (const id of ['profile-picture','login-show-password','login-password','register-show-password','register-password','login-username','game-sport','edit-game-sport']) {
+    for (const id of ['profile-picture','login-show-password','login-password','register-show-password','register-password','login-username','game-sport','edit-game-sport','game-date','edit-game-date']) {
         doc.getElementById(id).outerHTML = '<input id="' + id + '">';
     }
     doc.getElementById('game-form').outerHTML = '<form id="game-form"></form>';
