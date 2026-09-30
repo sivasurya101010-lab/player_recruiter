@@ -17,20 +17,20 @@ services:
 
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh docker-entrypoint.sh python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     environment:
       DJANGO_DEBUG: "True"
-      DJANGO_SECRET_KEY: dev-only-change-me
-      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
-      DB_NAME: player_recruiter
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-only-change-me}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DB_NAME: ${DB_NAME:-player_recruiter}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_HOST: db
-      DB_PORT: "5432"
+      DB_PORT: ${DB_PORT:-5432}
     depends_on:
       db:
         condition: service_healthy
