@@ -5,6 +5,10 @@ services:
     branch: developer-stage
     buildCommand: "./build.sh"
     startCommand: "gunicorn config.wsgi:application"
+    disk:
+      name: playlink-media
+      mountPath: /opt/render/project/src/media
+      sizeGB: 1
     envVars:
       - key: DATABASE_URL
         sync: false
