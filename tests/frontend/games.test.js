@@ -24,7 +24,7 @@ const ids = [
     'profile-form-message','profile-first-name','profile-last-name','profile-email',
     'profile-location','profile-phone','profile-bio','profile-save-btn',
     'joined-games-list','dashboard-joined-count','dashboard-upcoming-count',
-    'dashboard-hosted-count','game-details-modal','game-details-title',
+    'dashboard-hosted-count','create-game-error','game-details-modal','game-details-title',
     'game-details-sport','game-details-status','game-details-location','game-details-date',
     'game-details-time','game-details-description','game-details-list',
     'game-details-creator-name','game-details-creator-username','game-details-created-at',
