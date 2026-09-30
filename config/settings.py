@@ -11,13 +11,16 @@ load_dotenv(BASE_DIR / ".env")
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-if not SECRET_KEY:
-    if DEBUG:
-        SECRET_KEY = "dev-only-development-secret-key-change-me-please"
-    else:
-        raise ImproperlyConfigured(
-            "DJANGO_SECRET_KEY must be set when DJANGO_DEBUG=False."
-        )
+
+# PyJWT recommends at least 32 bytes for HMAC-SHA256 keys.
+# In local development, fall back to a safe development key if the
+# environment variable is missing or too short. Never do this in production.
+if DEBUG and (not SECRET_KEY or len(SECRET_KEY) < 32):
+    SECRET_KEY = "dev-only-development-secret-key-change-me-please"
+elif not SECRET_KEY:
+    raise ImproperlyConfigured(
+        "DJANGO_SECRET_KEY must be set when DJANGO_DEBUG=False."
+    )
 
 ALLOWED_HOSTS = [
     host.strip()
