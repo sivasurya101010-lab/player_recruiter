@@ -11,7 +11,7 @@ const ids = [
     'create-section','profile-section','menu-btn','app-nav-menu','dashboard-user-name',
     'login-panel','register-panel','navbar-home-link','nav-home-btn','nav-dashboard-btn',
     'nav-create-btn','nav-profile-btn','nav-logout-btn','profile-form',
-    'profile-cancel-btn','show-register-btn','show-login-btn','login-form','register-form','login-show-password','login-password','register-show-password','register-password','login-username','profile-picture','game-sport','edit-game-sport','game-date','edit-game-date','edit-game-form','game-form',
+    'profile-cancel-btn','show-register-btn','show-login-btn','login-form','register-form','login-show-password','login-password','register-show-password','register-password','login-username','profile-picture','game-sport','edit-game-sport','game-date','edit-game-date','edit-game-form','create-game-errors','game-form',
     'cancel-create-game-btn','see-more-games-btn','filter-sport','filter-date',
     'filter-status','games-list','explore-sport-tabs','joined-games-list',
     'profile-page-name','profile-page-username','profile-page-avatar',
