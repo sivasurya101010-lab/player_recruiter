@@ -357,7 +357,7 @@ def test_profile_picture_response_uses_playlink_api_url(api_client, user):
     picture_response = api_client.get(f'/api/auth/profile-picture/{user.id}/')
     assert picture_response.status_code == 200
     assert picture_response['Content-Type'].startswith('image/png')
-    assert picture_response.content
+    assert b''.join(picture_response.streaming_content)
 
 
 @pytest.mark.django_db
