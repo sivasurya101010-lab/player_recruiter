@@ -1,4 +1,7 @@
+from io import BytesIO
+
 import pytest
+from PIL import Image
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
@@ -305,9 +308,13 @@ def test_authenticated_user_can_update_phone_number(api_client, user):
 def test_authenticated_user_can_upload_profile_picture(api_client, user):
     api_client.force_authenticate(user=user)
 
+    image_buffer = BytesIO()
+    Image.new('RGBA', (1, 1), (255, 255, 255, 255)).save(image_buffer, format='PNG')
+    image_buffer.seek(0)
+
     image = SimpleUploadedFile(
         'profile.png',
-        b'\x89PNG\r\n\x1a\n\x00\x00\x00\x0dIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\x0dIDAT\x08\x99c\x60\x60\x60\x00\x00\x00\x04\x00\x01\x00\x0b\x02\x02\x00\x00\x00\x00IEND\xaeB\x60\x82',
+        image_buffer.read(),
         content_type='image/png',
     )
 
