@@ -203,6 +203,8 @@ async function loadApp() {
     $('menu-btn').classList.remove('d-none');
     $('app-nav-menu').classList.remove('d-none');
     $('dashboard-user-name').textContent = state.user.first_name || state.user.username;
+    renderNavProfile(state.user);
+    updateFilterButton();
 
     if (results[0].status === 'rejected') {
         showAlert(results[0].reason?.message || 'Could not load sports.', 'danger');
@@ -398,6 +400,7 @@ function renderExploreSportTabs() {
             state.showAllExploreGames = false;
             const filterSport = $('filter-sport');
             if (filterSport) filterSport.value = state.exploreSport;
+            updateFilterButton();
             loadGames().catch((error) => showAlert(error.message, 'danger'));
         });
     });
@@ -623,6 +626,53 @@ function renderExploreGames(games) {
             : 'See more games <span aria-hidden="true">→</span>';
     }
 }
+
+function updateFilterButton() {
+    const button = $('filter-toggle-btn');
+    const count = $('filter-count');
+    if (!button || !count) return;
+
+    const activeFilters = [
+        $('filter-sport')?.value,
+        $('filter-date')?.value,
+        $('filter-status')?.value
+    ].filter(Boolean).length;
+
+    count.textContent = String(activeFilters);
+    count.classList.toggle('d-none', activeFilters === 0);
+}
+
+function closeFilterDropdown() {
+    const menu = $('filter-toggle-btn');
+    if (!menu || !window.bootstrap) return;
+    bootstrap.Dropdown.getOrCreateInstance(menu).hide();
+}
+
+async function applyFilters() {
+    try {
+        await loadGames();
+        closeFilterDropdown();
+    } catch (error) {
+        showAlert(error.message, 'danger');
+    }
+}
+
+async function clearFilters() {
+    $('filter-sport').value = '';
+    $('filter-date').value = '';
+    $('filter-status').value = '';
+    state.exploreSport = '';
+    state.showAllExploreGames = false;
+    updateFilterButton();
+
+    try {
+        await loadGames();
+        closeFilterDropdown();
+    } catch (error) {
+        showAlert(error.message, 'danger');
+    }
+}
+
 async function loadGames() {
     const params = new URLSearchParams();
 
@@ -943,6 +993,7 @@ async function logout() {
     $('profile-section').classList.add('d-none');
     $('menu-btn').classList.add('d-none');
     $('app-nav-menu').classList.add('d-none');
+    hideNavProfile();
     $('dashboard-user-name').textContent = '';
 }
 
@@ -972,6 +1023,7 @@ function showLoginPanel() {
     $('profile-section').classList.add('d-none');
     $('menu-btn').classList.add('d-none');
     $('app-nav-menu').classList.add('d-none');
+    hideNavProfile();
     $('register-panel').classList.add('d-none');
     $('login-panel').classList.remove('d-none');
     $('alert-box').innerHTML = '';
@@ -993,6 +1045,38 @@ function getProfileDisplayName(profile) {
         .join(' ')
         .trim();
     return fullName || profile?.username || 'Player';
+}
+
+function renderNavProfile(profile) {
+    const button = $('nav-profile-btn-top');
+    const avatar = $('nav-profile-avatar');
+    const label = $('nav-profile-label');
+    if (!button || !avatar || !label) return;
+
+    const name = getProfileDisplayName(profile);
+    const initials = name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join('') || '?';
+
+    avatar.innerHTML = profile?.profile_picture
+        ? `<img src="${escapeHtml(profile.profile_picture)}" alt="" class="nav-profile-avatar-image">`
+        : `<span>${escapeHtml(initials)}</span>`;
+
+    label.textContent = name;
+    button.classList.remove('d-none');
+}
+
+function hideNavProfile() {
+    $('nav-profile-btn-top')?.classList.add('d-none');
+}
+
+function showWelcomeModal() {
+    const modal = $('playlink-welcome-modal');
+    if (!modal || !window.bootstrap) return;
+    bootstrap.Modal.getOrCreateInstance(modal).show();
 }
 
 function renderProfile(profile) {
@@ -1085,6 +1169,7 @@ async function saveProfile(event) {
         $('profile-picture').value = '';
         $('dashboard-user-name').textContent =
             updatedProfile.first_name || updatedProfile.username;
+        renderNavProfile(updatedProfile);
         showProfileMessage('Profile updated successfully.', 'success');
         showAlert('Profile updated successfully.', 'success');
     } catch (error) {
@@ -1138,6 +1223,7 @@ $('nav-home-btn').addEventListener('click', showHome);
 $('nav-dashboard-btn').addEventListener('click', showDashboard);
 $('nav-create-btn').addEventListener('click', showCreateGamePage);
 $('nav-profile-btn').addEventListener('click', showProfile);
+$('nav-profile-btn-top')?.addEventListener('click', showProfile);
 $('nav-logout-btn').addEventListener('click', logout);
 $('profile-picture').addEventListener('change', () => {
     const file = $('profile-picture').files[0];
@@ -1195,6 +1281,7 @@ $('register-form').addEventListener('submit', async (event) => {
     try {
         await register();
         showAlert('Account created successfully. Welcome to PlayLink!', 'success');
+        showWelcomeModal();
     } catch (error) {
         showAlert(error.message, 'danger');
     }
@@ -1209,14 +1296,17 @@ $('edit-game-date').min = today;
 $('game-form').addEventListener('input', clearCreateGameError);
 $('cancel-create-game-btn').addEventListener('click', showHome);
 $('edit-game-form').addEventListener('submit', saveGameEdit);
-$('filter-sport').addEventListener('change', loadGames);
+$('filter-sport')?.addEventListener('change', updateFilterButton);
+$('filter-date')?.addEventListener('change', updateFilterButton);
+$('filter-status')?.addEventListener('change', updateFilterButton);
+
+$('filter-apply-btn')?.addEventListener('click', applyFilters);
+$('filter-clear-btn')?.addEventListener('click', clearFilters);
 
 $('see-more-games-btn')?.addEventListener('click', () => {
     state.showAllExploreGames = !state.showAllExploreGames;
     renderExploreGames(state.exploreGames || []);
 });
-$('filter-date').addEventListener('change', loadGames);
-$('filter-status').addEventListener('change', loadGames);
 
 
 $('google-login-btn')?.addEventListener('click', () => {
