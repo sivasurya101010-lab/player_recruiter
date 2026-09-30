@@ -328,3 +328,39 @@ def test_authenticated_user_can_upload_profile_picture(api_client, user):
     assert response.data['profile_picture']
     user.refresh_from_db()
     assert user.profile_picture.name.startswith('profile_picture/')
+
+
+@pytest.mark.django_db
+def test_profile_picture_response_uses_playlink_api_url(api_client, user):
+    api_client.force_authenticate(user=user)
+
+    image_buffer = BytesIO()
+    Image.new('RGB', (2, 2), (255, 0, 0)).save(image_buffer, format='PNG')
+    image_buffer.seek(0)
+
+    image = SimpleUploadedFile(
+        'avatar.png',
+        image_buffer.read(),
+        content_type='image/png',
+    )
+
+    upload_response = api_client.patch(
+        '/api/auth/me/',
+        {'profile_picture': image},
+        format='multipart',
+    )
+
+    assert upload_response.status_code == 200
+    picture_url = upload_response.data['profile_picture']
+    assert picture_url.endswith(f'/api/auth/profile-picture/{user.id}/')
+
+    picture_response = api_client.get(f'/api/auth/profile-picture/{user.id}/')
+    assert picture_response.status_code == 200
+    assert picture_response['Content-Type'].startswith('image/png')
+    assert picture_response.content
+
+
+@pytest.mark.django_db
+def test_profile_picture_endpoint_returns_404_without_picture(api_client, user):
+    response = api_client.get(f'/api/auth/profile-picture/{user.id}/')
+    assert response.status_code == 404
