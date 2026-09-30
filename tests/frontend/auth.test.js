@@ -82,7 +82,8 @@ function response(data, status = 200) {
     return {
         ok: status >= 200 && status < 300,
         status,
-        text: async () => JSON.stringify(data)
+        text: async () => JSON.stringify(data),
+        json: async () => data
     };
 }
 
