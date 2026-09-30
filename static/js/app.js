@@ -80,6 +80,36 @@ function getErrorMessage(data, status) {
     return messages.length ? messages.join(' ') : 'Something went wrong. Please try again.';
 }
 
+function getProfilePictureUrl(value) {
+    if (!value) return '';
+
+    const raw = String(value).trim();
+    if (!raw) return '';
+
+    // Django can return either an absolute media URL or the stored ImageField path.
+    if (/^https?:\\/\\//i.test(raw)) {
+        return raw;
+    }
+
+    if (raw.startsWith('/media/')) {
+        return raw;
+    }
+
+    if (raw.startsWith('media/')) {
+        return '/' + raw;
+    }
+
+    if (raw.startsWith('/profile_picture/')) {
+        return '/media' + raw;
+    }
+
+    if (raw.startsWith('profile_picture/')) {
+        return '/media/' + raw;
+    }
+
+    return raw;
+}
+
 function escapeHtml(value) {
     return String(value ?? '')
         .replaceAll('&', '&amp;')
@@ -798,7 +828,7 @@ async function showPlayers(id) {
                 const location = player.location || 'Location not added';
                 const bio = player.bio || 'No bio added yet.';
                 const profilePicture = player.profile_picture
-                    ? `<img src="${escapeHtml(player.profile_picture)}" alt="" class="players-modal-avatar-image">`
+                    ? `<img src="${escapeHtml(getProfilePictureUrl(player.profile_picture))}" alt="" class="players-modal-avatar-image">`
                     : `<span>${escapeHtml(initials)}</span>`;
 
                 return `
@@ -1043,7 +1073,7 @@ function renderNavProfile(profile) {
         .join('') || '?';
 
     avatar.innerHTML = profile?.profile_picture
-        ? `<img src="${escapeHtml(profile.profile_picture)}" alt="" class="nav-profile-avatar-image">`
+        ? `<img src="${escapeHtml(getProfilePictureUrl(profile.profile_picture))}" alt="" class="nav-profile-avatar-image">`
         : `<span>${escapeHtml(initials)}</span>`;
 
     label.textContent = name;
@@ -1074,7 +1104,7 @@ function renderProfile(profile) {
     $('profile-page-username').textContent = '@' + (profile.username || 'player');
 
     const avatar = profile.profile_picture
-        ? `<img src="${escapeHtml(profile.profile_picture)}" alt="" class="profile-page-avatar-image">`
+        ? `<img src="${escapeHtml(getProfilePictureUrl(profile.profile_picture))}" alt="" class="profile-page-avatar-image">`
         : `<span>${escapeHtml(initials)}</span>`;
 
     $('profile-page-avatar').innerHTML = avatar;
