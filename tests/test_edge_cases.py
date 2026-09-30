@@ -31,7 +31,7 @@ def authenticated_client(api_client, user):
 
 @pytest.fixture
 def sport():
-    return Sports.objects.create(name='Football', is_active=True)
+    return Sports.objects.get(name='Football')
 
 
 @pytest.fixture
