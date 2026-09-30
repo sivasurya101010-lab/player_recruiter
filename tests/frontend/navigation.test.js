@@ -8,7 +8,7 @@ const appSource = fs.readFileSync('static/js/app.js', 'utf8');
 
 const ids = [
     'alert-box','session-loading','auth-section','app-section','dashboard-section',
-    'create-section','profile-section','menu-btn','app-nav-menu','dashboard-user-name',
+    'create-section','profile-section','menu-btn','app-nav-menu','playlink-menu','dashboard-user-name',
     'login-panel','register-panel','navbar-home-link','nav-home-btn','nav-dashboard-btn',
     'nav-create-btn','nav-profile-btn','nav-logout-btn','profile-form',
     'profile-cancel-btn','show-register-btn','show-login-btn','login-form','register-form','login-show-password','login-password','register-show-password','register-password','login-username','profile-picture','game-sport','edit-game-sport','game-date','edit-game-date','edit-game-form','create-game-errors','game-form',
@@ -56,7 +56,7 @@ function createApp(fetchImpl = async () => ({
             Offcanvas: {
                 getOrCreateInstance: () => ({
                     hide() {
-                        doc.getElementById('app-nav-menu')?.classList.remove('show');
+                        doc.getElementById('playlink-menu')?.classList.remove('show');
                     }
                 })
             },
@@ -224,7 +224,7 @@ test('sport tabs select the requested sport and reload games', async () => {
 
 test('closePlayLinkMenu closes the navigation menu', () => {
     const {dom, context} = createApp();
-    const menu = dom.window.document.getElementById('app-nav-menu');
+    const menu = dom.window.document.getElementById('playlink-menu');
     menu.classList.add('show');
 
     context.closePlayLinkMenu();
