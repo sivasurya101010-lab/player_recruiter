@@ -11,22 +11,15 @@ def api_client():
 
 @pytest.fixture
 def sports():
-    football = Sports.objects.create(
-        name='Football',
-        description='Football games',
-        is_active=True,
-    )
-    cricket = Sports.objects.create(
-        name='Cricket',
-        description='Cricket games',
-        is_active=True,
-    )
+    football = Sports.objects.get(name='Football')
+    cricket = Sports.objects.get(name='Cricket')
     Sports.objects.create(
-        name='Inactive Sport',
+        name='Inactive Sport Test',
         description='Not available',
         is_active=False,
     )
     return football, cricket
+
 
 
 @pytest.mark.django_db
@@ -34,8 +27,10 @@ def test_active_sports_are_returned(api_client, sports):
     response = api_client.get('/api/sports/')
 
     assert response.status_code == 200
-    assert len(response.data) == 2
-    assert {sport['name'] for sport in response.data} == {'Football', 'Cricket'}
+    assert len(response.data) == 5
+    assert {'Football', 'Cricket', 'Tennis', 'Badminton', 'Other'} <= {
+        sport['name'] for sport in response.data
+    }
 
 
 @pytest.mark.django_db
@@ -43,7 +38,7 @@ def test_inactive_sport_is_not_returned(api_client, sports):
     response = api_client.get('/api/sports/')
 
     names = [sport['name'] for sport in response.data]
-    assert 'Inactive Sport' not in names
+    assert 'Inactive Sport Test' not in names
 
 
 @pytest.mark.django_db
