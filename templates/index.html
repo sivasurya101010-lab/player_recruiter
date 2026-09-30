@@ -12,17 +12,29 @@
 
 <nav class="navbar navbar-dark bg-dark sticky-top">
     <div class="container position-relative">
-        <button
-            id="menu-btn"
-            type="button"
-            class="nav-menu-button d-none"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#playlink-menu"
-            aria-controls="playlink-menu"
-            aria-label="Open PlayLink menu"
-        >
-            <span aria-hidden="true">☰</span>
-        </button>
+        <div class="nav-left-controls">
+            <button
+                id="menu-btn"
+                type="button"
+                class="nav-menu-button d-none"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#playlink-menu"
+                aria-controls="playlink-menu"
+                aria-label="Open PlayLink menu"
+            >
+                <span aria-hidden="true">☰</span>
+            </button>
+
+            <button
+                id="nav-profile-btn-top"
+                type="button"
+                class="nav-profile-button d-none"
+                aria-label="Open my profile"
+            >
+                <span id="nav-profile-avatar" class="nav-profile-avatar">?</span>
+                <span id="nav-profile-label" class="nav-profile-label">Profile</span>
+            </button>
+        </div>
 
         <a class="navbar-brand fw-bold position-absolute start-50 translate-middle-x" href="#" id="navbar-home-link">PlayLink</a>
     </div>
@@ -172,41 +184,73 @@
             </div>
         </div>
 
-        <section id="games-section-header" class="find-game-card">
-            <div class="find-game-header">
-                <h2>SEARCH FILTER</h2>
-                <p>Filter games and find players near you.</p>
+        <section id="games-section-header" class="games-section-toolbar">
+            <div>
+                <p class="dashboard-eyebrow mb-1">DISCOVER</p>
+                <h2>EXPLORE GAMES</h2>
             </div>
 
-            <div class="find-game-filters">
-                <div class="find-game-filter">
-                    <label class="form-label" for="filter-sport">Sport</label>
-                    <select id="filter-sport" class="form-select">
-                        <option value="">All sports</option>
-                    </select>
-                </div>
+            <div class="dropdown">
+                <button
+                    id="filter-toggle-btn"
+                    type="button"
+                    class="filter-toggle-btn dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside"
+                    aria-expanded="false"
+                >
+                    <span aria-hidden="true">☷</span>
+                    Filter
+                    <span id="filter-count" class="filter-count d-none">0</span>
+                </button>
 
-                <div class="find-game-filter">
-                    <label class="form-label" for="filter-date">Date</label>
-                    <input id="filter-date" type="date" class="form-control">
-                </div>
+                <div class="dropdown-menu dropdown-menu-end filter-dropdown-menu">
+                    <div class="filter-dropdown-header">
+                        <div>
+                            <strong>Search filters</strong>
+                            <span>Find games by sport, date or status.</span>
+                        </div>
+                    </div>
 
-                <div class="find-game-filter">
-                    <label class="form-label" for="filter-status">Status</label>
-                    <select id="filter-status" class="form-select">
-                        <option value="">All</option>
-                        <option value="OPEN">Open</option>
-                        <option value="FULL">Full</option>
-                        <option value="CANCELLED">Cancelled</option>
-                        <option value="COMPLETED">Completed</option>
-                    </select>
+                    <div class="find-game-filters">
+                        <div class="find-game-filter">
+                            <label class="form-label" for="filter-sport">Sport</label>
+                            <select id="filter-sport" class="form-select">
+                                <option value="">All sports</option>
+                            </select>
+                        </div>
+
+                        <div class="find-game-filter">
+                            <label class="form-label" for="filter-date">Date</label>
+                            <input id="filter-date" type="date" class="form-control">
+                        </div>
+
+                        <div class="find-game-filter">
+                            <label class="form-label" for="filter-status">Status</label>
+                            <select id="filter-status" class="form-select">
+                                <option value="">All</option>
+                                <option value="OPEN">Open</option>
+                                <option value="FULL">Full</option>
+                                <option value="CANCELLED">Cancelled</option>
+                                <option value="COMPLETED">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-dropdown-actions">
+                        <button id="filter-clear-btn" type="button" class="btn btn-light">Clear</button>
+                        <button id="filter-apply-btn" type="button" class="btn btn-primary">Apply filters</button>
+                    </div>
                 </div>
             </div>
         </section>
 
         <section id="explore-games-section" class="explore-games-section">
             <div class="explore-games-header">
-                <h2>EXPLORE GAMES</h2>
+                <div>
+                    <h2>EXPLORE GAMES</h2>
+                    <p class="explore-games-subtitle">Find a game, join players and get on the field.</p>
+                </div>
                 <button id="see-more-games-btn" type="button" class="see-more-games-btn">
                     See more games <span aria-hidden="true">→</span>
                 </button>
@@ -441,6 +485,53 @@
     </section>
 </main>
 
+<div class="modal fade" id="playlink-welcome-modal" tabindex="-1" aria-labelledby="playlink-welcome-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content playlink-welcome-modal">
+            <div class="modal-header">
+                <div>
+                    <span class="welcome-modal-eyebrow">WELCOME TO PLAYLINK</span>
+                    <h5 id="playlink-welcome-title" class="modal-title">You’re ready to play.</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="welcome-modal-intro">
+                    PlayLink helps you find local games, join available players and create your own games when you need more people.
+                </p>
+
+                <div class="welcome-feature-list">
+                    <div class="welcome-feature">
+                        <span class="welcome-feature-icon" aria-hidden="true">⚽</span>
+                        <div>
+                            <strong>Find games</strong>
+                            <span>Explore games by sport, date and status.</span>
+                        </div>
+                    </div>
+                    <div class="welcome-feature">
+                        <span class="welcome-feature-icon" aria-hidden="true">👥</span>
+                        <div>
+                            <strong>Join players</strong>
+                            <span>Open a game to see who has joined and available slots.</span>
+                        </div>
+                    </div>
+                    <div class="welcome-feature">
+                        <span class="welcome-feature-icon" aria-hidden="true">＋</span>
+                        <div>
+                            <strong>Create a game</strong>
+                            <span>Host your own game when you need more players.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-primary w-100 welcome-modal-button" data-bs-dismiss="modal">
+                    Start exploring
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="game-details-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content game-details-modal">
@@ -556,6 +647,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{% static 'js/app.js' %}?v=20260929-15"></script>
+<script src="{% static 'js/app.js' %}?v=20260930-01"></script>
 </body>
 </html>
