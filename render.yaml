@@ -18,3 +18,9 @@ services:
         value: "True"
       - key: DJANGO_SECURE_HSTS_SECONDS
         value: "31536000"
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
