@@ -1,6 +1,12 @@
+from mimetypes import guess_type
+
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+
 from rest_framework import generics
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenObtainPairView, TokenRefreshView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from .models import User
@@ -33,7 +39,7 @@ class RefreshTokenView(TokenRefreshView):
         summary="Refresh access token",
         description="Use a valid refresh token to obtain a new access token.",
         responses={
-            200: OpenApiResponse(description="New access token returned successfully."),
+            200: UserSerializer,
             401: OpenApiResponse(description="Invalid or expired refresh token."),
         },
         auth=[],
@@ -50,7 +56,7 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
     @extend_schema(
-        summary="Register a user",
+        summary="Register",
         description="Create a new PlayLink user account.",
         responses={
             201: UserSerializer,
@@ -81,6 +87,29 @@ class MyProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class ProfilePictureView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+
+        if not user.profile_picture:
+            return OpenApiResponse(status_code=404)
+
+        content_type = guess_type(user.profile_picture.name)[0] or 'application/octet-stream'
+
+        try:
+            response = FileResponse(
+                user.profile_picture.open('rb'),
+                content_type=content_type,
+            )
+        except FileNotFoundError:
+            return OpenApiResponse(status_code=404)
+
+        response['Cache-Control'] = 'public, max-age=86400'
+        return response
 
 
 class LogoutView(TokenBlacklistView):
