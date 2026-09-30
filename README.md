@@ -1,243 +1,76 @@
-# Player Recruitment Platform
+# PlayLink — Sports Player Recruitment Platform
 
-A backend platform for finding and joining casual sports games when players are needed.
+PlayLink is a Django/DRF platform for finding players for casual football, cricket, and other sports games when a group does not have enough players.
 
-## Problem
+## What it demonstrates
 
-Sometimes a group of people wants to play a casual game of football, cricket, badminton, or another sport but doesn't have enough players.
+- JWT access/refresh authentication with refresh-token blacklist logout
+- Custom user profiles with profile media and validation
+- Sports management with support for custom "Other" sports
+- Game creation, discovery, detail, join, leave, edit, cancel, delete, and player-list workflows
+- Creator-only authorization and authenticated API access
+- Duplicate-join prevention at both application and database levels
+- Atomic last-slot handling with `transaction.atomic()` and `select_for_update()`
+- Filtering by sport, status, date/date range, and location
+- PostgreSQL database integration and reusable Django FilterSets
+- Swagger/OpenAPI documentation through drf-spectacular
+- Automated backend and frontend tests
+- GitHub Actions CI running against PostgreSQL
+- Docker Compose development environment
 
-For example:
+## Stack
 
-> 5 players are ready for a football game, but they need 2 more players.
+**Backend:** Python, Django, Django REST Framework, SimpleJWT  
+**Database:** PostgreSQL  
+**Filtering/API docs:** django-filter, drf-spectacular / Swagger  
+**Testing:** pytest, pytest-django, Django TestCase, Node.js test runner, jsdom  
+**Frontend:** HTML, CSS, Bootstrap, Vanilla JavaScript  
+**CI:** GitHub Actions  
+**Containerization:** Docker, Docker Compose
 
-The platform allows users to create a game and recruit nearby players who are interested in joining.
+## API documentation
 
-## Core Idea
+After starting the project:
 
-The platform works like a **live recruitment board for casual sports games**.
+- Swagger UI: `/api/docs/`
+- OpenAPI schema: `/api/schema/`
 
-Users can:
+## Run locally
 
-* Create a game
-* Specify the sport, date, time, location, and required players
-* Discover available games
-* View game details
-* Join a game
-* Leave a game
-* Manage games they created
+Create a virtual environment, install `requirements.txt`, configure PostgreSQL through `.env`, run migrations, and start Django:
 
-Once the required number of players is reached, the game becomes full and new players cannot join.
-
-## Planned MVP
-
-### Authentication
-
-* User registration
-* JWT login
-* JWT token refresh
-* User profile
-* Secure password handling
-
-### Sports
-
-* Sports management
-* Supported sports
-* Sport-specific information
-
-### Games
-
-* Create a game
-* View game details
-* List available games
-* Filter games
-* Join a game
-* Leave a game
-* Cancel a game
-* Automatically mark games as full
-
-### Location
-
-* Game location
-* Location-based game discovery
-
-## Technology Stack
-
-### Backend
-
-* Python
-* Django
-* Django REST Framework
-
-### Database
-
-* PostgreSQL
-
-### Authentication
-
-* JWT
-* Django authentication system
-
-### Development Tools
-
-* Git
-* GitHub
-* Postman
-
-## Project Structure
-
-```text
-PlayerRecruitment/
-│
-├── config/
-│   ├── __init__.py
-│   ├── settings.py
-│   ├── urls.py
-│   ├── asgi.py
-│   └── wsgi.py
-│
-├── users/
-│   ├── migrations/
-│   ├── admin.py
-│   ├── apps.py
-│   ├── models.py
-│   ├── serializers.py
-│   ├── urls.py
-│   ├── views.py
-│   └── tests.py
-│
-├── manage.py
-├── .env
-├── .gitignore
-└── requirements.txt
+```bash
+python manage.py migrate
+python manage.py runserver
 ```
 
-## Current Development Status
+## Run with Docker
 
-### Phase 1 — Project Setup
-
-* [x] Django project setup
-* [x] Django REST Framework setup
-* [x] PostgreSQL setup
-* [x] Environment variables
-* [x] Database configuration
-* [x] Git setup
-
-### Phase 2 — User & Authentication
-
-* [x] Custom User model
-* [x] Django admin integration
-* [x] JWT authentication setup
-* [x] Registration serializer
-* [x] Registration API
-* [x] JWT login API
-* [x] JWT refresh API
-
-### Upcoming
-
-* [ ] Sports system
-* [ ] Game creation
-* [ ] Game discovery
-* [ ] Player joining
-* [ ] Authorization
-* [ ] Game management
-* [ ] Location-based discovery
-* [ ] Concurrency handling
-* [ ] Notifications
-* [ ] Automated tests
-* [ ] API documentation
-* [ ] Deployment
-
-## API Structure
-
-The planned API will follow a structure similar to:
-
-```text
-/api/auth/
-    ├── register/
-    ├── login/
-    └── refresh/
-
-/api/sports/
-    └── ...
-
-/api/games/
-    ├── create/
-    ├── ...
-    └── ...
+```bash
+docker compose up --build
 ```
 
-## Important Backend Considerations
+The application is then available at `http://localhost:8000/`.
 
-A major requirement of the platform is preventing overbooking when multiple users try to join the last available slot simultaneously.
+## Test suite
 
-For example:
+The repository contains backend tests for authentication, permissions, validation, game workflows, security/edge cases, schema behavior, and concurrency, plus frontend tests for authentication, games, navigation, and profiles.
 
-```text
-Game capacity: 7
+GitHub Actions runs the frontend tests, pytest suite, and Django tests against PostgreSQL on pushes and pull requests.
 
-Current players: 6
+## Concurrency case
 
-User A ──┐
-         ├── Join request
-User B ──┘
+The most important business rule is preventing overbooking when multiple users request the final slot simultaneously.
+
+The join workflow locks the game row inside a database transaction:
+
+```python
+with transaction.atomic():
+    game = Game.objects.select_for_update().get(pk=pk)
 ```
 
-Only one user should successfully receive the final slot.
+A dedicated concurrent test verifies that two simultaneous requests cannot consume the same final slot.
 
-The backend will therefore need proper transaction handling and database-level concurrency control.
+## Development workflow
 
-## Development Philosophy
-
-The project is being developed incrementally following a real-world backend development workflow:
-
-```text
-Requirements
-     ↓
-Database Design
-     ↓
-API Design
-     ↓
-Implementation
-     ↓
-Validation
-     ↓
-Testing
-     ↓
-Documentation
-     ↓
-Deployment
-```
-
-The goal is not only to build a working application, but also to demonstrate practical backend engineering concepts such as:
-
-* REST API design
-* Authentication and authorization
-* Database relationships
-* Validation
-* Transactions
-* Concurrency control
-* Query optimization
-* Testing
-* API documentation
-* Deployment
-
-## Future Features
-
-After the MVP, the platform may support:
-
-* Player ratings
-* Player reliability scores
-* Waitlists
-* Recurring games
-* Notifications
-* Real-time chat
-* WebSockets
-* Maps
-* Ground booking
-* Payments
-* Game history
-* Advanced recommendations
-
-## Status
-
-🚧 **Under active development**
+Requirements → database design → API design → implementation → validation → tests → documentation → containerized development/deployment preparation.

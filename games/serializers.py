@@ -11,18 +11,25 @@ class GameSerializer(serializers.ModelSerializer):
 
     creator = UserSerializer(read_only=True)
 
-    sport_details = SportSerializer(source='sport',read_only=True)
+    sport_details = SportSerializer(source='sport', read_only=True)
 
-    # this sport is to validate the user providing sport id
-    sport = serializers.PrimaryKeyRelatedField(queryset=Sports.objects.filter(is_active=True))
+    sport = serializers.PrimaryKeyRelatedField(
+        queryset=Sports.objects.filter(is_active=True)
+    )
 
-    current_palyers = serializers.SerializerMethodField()
+    custom_sport_name = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=100,
+    )
+
+    current_players = serializers.SerializerMethodField()
     available_slots = serializers.SerializerMethodField()
+    is_joined = serializers.SerializerMethodField()
+    is_creator = serializers.SerializerMethodField()
 
     class Meta:
-
         model = Game
-
         fields = '__all__'
 
         read_only_fields = [
@@ -33,11 +40,23 @@ class GameSerializer(serializers.ModelSerializer):
             'updated_at'
         ]
 
-    def get_current_palyers(self, values):
+    def get_current_players(self, values) -> int:
         return values.participation.count()
 
-    def get_available_slots(self, values):
-        return max(0,values.players_needed - values.participation.count())
+    def get_available_slots(self, values) -> int:
+        return max(0, values.players_needed - values.participation.count())
+
+    def get_is_joined(self, values) -> bool:
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return values.participation.filter(user=request.user).exists()
+
+    def get_is_creator(self, values) -> bool:
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return values.creator_id == request.user.id
 
     def validate_players_needed(self, value):
 
@@ -49,21 +68,33 @@ class GameSerializer(serializers.ModelSerializer):
     def validate_duration(self, value):
 
         if value <= 0:
-            raise serializers.ValidationError("Duration must be greater than 0 minutes.")
+            raise serializers.ValidationError(
+                "Duration must be greater than 0 minutes."
+            )
 
         return value
 
     def validate(self, values):
 
-        sport = values.get('sport')
+        players_needed = values.get('players_needed')
 
-        custom_sport_name = values.get('custom_sport_name','').strip()
+        if self.instance and players_needed is not None:
+            current_players = self.instance.participation.count()
 
-        if sport.name == 'Other':
+            if players_needed < current_players:
+                raise serializers.ValidationError({
+                    'players_needed':
+                        'Players needed cannot be less than the current number of players.'
+                })
 
-            if not custom_sport_name:
-                raise serializers.ValidationError({'custom_sport_name':'Please specify the sport name when selecting Other.'})
+        custom_sport_name = values.get('custom_sport_name', '').strip()
 
-        values['custom_sport_name'] = custom_sport_name
+        if custom_sport_name:
+            raise serializers.ValidationError({
+                'custom_sport_name':
+                    'Custom sports are not allowed. Please select a sport from the developer-managed sports list.'
+            })
+
+        values['custom_sport_name'] = ''
 
         return values
