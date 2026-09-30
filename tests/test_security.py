@@ -87,7 +87,7 @@ def test_development_settings_do_not_force_production_security():
     settings = json.loads(result.stdout)
 
     assert settings['debug'] is True
-    assert settings['secret_key'] == 'dev-only-change-me'
+    assert settings['secret_key'] == 'dev-only-development-secret-key-change-me-please'
     assert settings['secure_ssl_redirect'] is False
     assert settings['session_cookie_secure'] is False
     assert settings['csrf_cookie_secure'] is False
