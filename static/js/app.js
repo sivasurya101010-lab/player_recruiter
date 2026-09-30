@@ -129,7 +129,19 @@ async function apiFetch(path, options = {}, retry = true) {
         headers.set('Authorization', `Bearer ${state.access}`);
     }
 
-    const response = await fetch(API + path, {...options, headers});
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    let response;
+
+    try {
+        response = await fetch(API + path, {
+            ...options,
+            headers,
+            signal: options.signal || controller.signal
+        });
+    } finally {
+        clearTimeout(timeout);
+    }
 
     if (response.status === 401 && retry && state.refresh) {
         const refreshResponse = await fetch(API + '/auth/refresh/', {
@@ -216,14 +228,8 @@ async function register() {
 async function loadApp() {
     state.user = await apiFetch('/auth/me/');
 
-    // Load the Home data before displaying the Home page. Previously the
-    // page became visible while games were still loading, which could leave
-    // the game area blank until the user clicked Home from the menu.
-    const results = await Promise.allSettled([
-        loadSports(),
-        loadGames()
-    ]);
-
+    // Authentication is restored successfully, so show the application now.
+    // Do not keep the whole UI hidden while games/sports endpoints load.
     $('session-loading').classList.add('d-none');
     $('auth-section').classList.add('d-none');
     $('app-section').classList.remove('d-none');
@@ -236,14 +242,17 @@ async function loadApp() {
     renderNavProfile(state.user);
     updateFilterButton();
 
-    if (results[0].status === 'rejected') {
-        showAlert(results[0].reason?.message || 'Could not load sports.', 'danger');
-    }
+    loadSports().catch((error) => {
+        console.error('PlayLink sports load failed:', error);
+        showAlert(error.message || 'Could not load sports.', 'danger');
+    });
 
-    if (results[1].status === 'rejected') {
-        showAlert(results[1].reason?.message || 'Could not load recently added games.', 'danger');
-    }
+    loadGames().catch((error) => {
+        console.error('PlayLink games load failed:', error);
+        showAlert(error.message || 'Could not load recently added games.', 'danger');
+    });
 }
+
 
 async function restoreSession() {
     if (!state.access && !state.refresh) {
@@ -268,12 +277,21 @@ async function restoreSession() {
     }
 
     try {
-        const refreshResponse = await fetch(API + '/auth/refresh/', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({refresh: state.refresh}),
-            cache: 'no-store'
-        });
+        const refreshController = new AbortController();
+        const refreshTimeout = setTimeout(() => refreshController.abort(), 15000);
+        let refreshResponse;
+
+        try {
+            refreshResponse = await fetch(API + '/auth/refresh/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({refresh: state.refresh}),
+                cache: 'no-store',
+                signal: refreshController.signal
+            });
+        } finally {
+            clearTimeout(refreshTimeout);
+        }
 
         if (!refreshResponse.ok) {
             console.error('PlayLink refresh request failed:', refreshResponse.status);
