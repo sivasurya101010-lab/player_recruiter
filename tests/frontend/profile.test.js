@@ -14,7 +14,7 @@ const elementIds = [
     'nav-profile-btn', 'nav-logout-btn', 'profile-picture', 'profile-form',
     'profile-cancel-btn', 'show-register-btn', 'show-login-btn',
     'login-show-password', 'login-password', 'register-show-password',
-    'register-password', 'login-form', 'login-username', 'game-form',
+    'register-password', 'login-form', 'register-form', 'login-show-password', 'login-password', 'register-show-password', 'register-password', 'login-username', 'game-sport', 'edit-game-sport', 'game-form',
     'game-date', 'edit-game-date', 'cancel-create-game-btn',
     'edit-game-form', 'filter-sport', 'see-more-games-btn', 'filter-date',
     'filter-status', 'google-login-btn', 'forgot-password-btn', 'game-sport',
