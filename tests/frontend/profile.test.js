@@ -71,6 +71,7 @@ function createApp() {
             createObjectURL: () => 'blob:test-profile-picture'
         },
         Headers,
+        URLSearchParams,
         FormData: dom.window.FormData,
         File: dom.window.File,
         fetch: async (url, options = {}) => {
