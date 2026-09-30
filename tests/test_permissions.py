@@ -32,7 +32,7 @@ def users():
 @pytest.fixture
 def game(users):
     creator, _ = users
-    sport = Sports.objects.create(name='Football', is_active=True)
+    sport = Sports.objects.get(name='Football')
 
     game = Game.objects.create(
         creator=creator,
