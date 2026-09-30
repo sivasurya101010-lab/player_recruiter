@@ -17,6 +17,12 @@ class GameSerializer(serializers.ModelSerializer):
         queryset=Sports.objects.filter(is_active=True)
     )
 
+    custom_sport_name = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=100,
+    )
+
     current_players = serializers.SerializerMethodField()
     available_slots = serializers.SerializerMethodField()
     is_joined = serializers.SerializerMethodField()
@@ -81,15 +87,14 @@ class GameSerializer(serializers.ModelSerializer):
                         'Players needed cannot be less than the current number of players.'
                 })
 
-        sport = values.get('sport') or getattr(self.instance, 'sport', None)
         custom_sport_name = values.get('custom_sport_name', '').strip()
 
-        if sport.name == 'Other' and not custom_sport_name:
+        if custom_sport_name:
             raise serializers.ValidationError({
                 'custom_sport_name':
-                    'Please specify the sport name when selecting Other.'
+                    'Custom sports are not allowed. Please select a sport from the developer-managed sports list.'
             })
 
-        values['custom_sport_name'] = custom_sport_name
+        values['custom_sport_name'] = ''
 
         return values
