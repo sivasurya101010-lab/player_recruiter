@@ -59,6 +59,7 @@ function createApp(fetchImpl) {
         localStorage: dom.window.localStorage,
         URL: {createObjectURL: () => 'blob:test-picture'},
         Headers,
+        URLSearchParams,
         FormData: dom.window.FormData,
         File: dom.window.File,
         fetch: async (url, options = {}) => {
