@@ -1,6 +1,6 @@
 const API = `${window.location.origin}/api`;
 
-const state = {
+var state = {
     access: localStorage.getItem('playerRecruiterAccess'),
     refresh: localStorage.getItem('playerRecruiterRefresh'),
     user: null,
