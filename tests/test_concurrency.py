@@ -30,7 +30,7 @@ def test_concurrent_joins_cannot_exceed_available_slots():
         password='TestPassword123',
     )
 
-    sport = Sports.objects.create(name='Football', is_active=True)
+    sport = Sports.objects.get(name='Football')
 
     game = Game.objects.create(
         creator=creator,
