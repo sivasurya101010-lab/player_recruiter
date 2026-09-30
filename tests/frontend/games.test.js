@@ -66,7 +66,7 @@ function createApp(fetchImpl) {
     const context = vm.createContext({
         window: dom.window, document: doc, localStorage: dom.window.localStorage,
         URL: {createObjectURL: () => 'blob:test-picture'},
-        Headers, FormData: dom.window.FormData, File: dom.window.File,
+        Headers, URLSearchParams, FormData: dom.window.FormData, File: dom.window.File,
         fetch: async (url, options = {}) => {
             calls.push({url, options});
             return fetchImpl(url, options);
