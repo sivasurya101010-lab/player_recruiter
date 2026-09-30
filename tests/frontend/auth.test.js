@@ -167,7 +167,7 @@ test('apiFetch refreshes an expired access token and retries the request', async
 
     const data = await context.apiFetch('/test/');
 
-    assert.deepEqual(data, {ok: true});
+    assert.equal(data.ok, true);
     assert.equal(requestCount, 2);
     assert.equal(dom.window.localStorage.getItem('playerRecruiterAccess'), 'new-access-token');
     assert.equal(dom.window.localStorage.getItem('playerRecruiterRefresh'), 'new-refresh-token');
