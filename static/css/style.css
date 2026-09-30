@@ -2340,3 +2340,25 @@ body {
         padding: 17px;
     }
 }
+
+
+.games-toolbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.games-toolbar-actions .see-more-games-btn {
+    white-space: nowrap;
+}
+
+@media (max-width: 575px) {
+    .games-toolbar-actions {
+        gap: 5px;
+    }
+
+    .games-toolbar-actions .see-more-games-btn {
+        display: none !important;
+    }
+}
